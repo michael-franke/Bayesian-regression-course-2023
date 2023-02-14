@@ -1,0 +1,1328 @@
+---
+title: "Bayesian regression: theory & practice"
+subtitle: "01: Wrangling, plotting, and simple linear regression"
+author: "Michael Franke"
+format: html
+editor: visual
+execute:
+  error: false
+  warning: false
+  message: false
+callout-appearance: simple
+---
+
+{{< include 00-preamble.qmd >}}
+
+# Exploring the data set
+
+Let's first explore the data set which we will be using during the course. It is rich and fun.
+
+We will be analyzing data from Experiment 1 of the following paper:
+
+Scherbaum, S., & Kieslich, P. J. (2018). Stuck at the starting line: How the starting procedure influences mouse-tracking data. Behavior Research Methods, 50(5), 2097-2110.
+
+[https://osf.io/7vrkz/](link%20to%20OSF)
+
+It's a methodological paper but it replicates a very intuitive finding. When you are categorizing animals into types (e.g. a 'dog' into the type 'mammal'), you perform better when the animal is prototypical (dog \--\> mammal) as opposed to atypical (dolphin \--\> mammal). This 'performing better' is measured in different ways: reaction time, accuracy (correct vs. incorrect) and several measurement of the cursor movement toward the correct answer.
+
+## Loading and inspecting the data
+
+The data is part of the `aida` package, but we can give it a fancy new name:
+
+```{r}
+dolphin <- aida::data_MT
+```
+
+To get some information about the data set, we can use the `help` function:
+
+```{r}
+help("data_MT")
+```
+
+Here is some more information we can get about the data:
+
+```{r}
+
+# number of rows in the data set
+nrow(dolphin)
+
+# number of columns in the data set
+ncol(dolphin)
+
+# names of the columns
+names(dolphin)
+
+# number of unique `subject_id`s
+dolphin$subject_id |> unique() |> length()
+
+# number of types each subject saw different `conditions`
+dolphin |> with(table(subject_id, condition)) |> head()
+```
+
+``` {head(dolphin)}
+```
+
+## A closer look at the columns
+
+Let's take a closer look at the columns and the information inside them.
+
+We can get a `glimpse` of all columns like so:
+
+```{r}
+glimpse(dolphin)
+```
+
+Here is a quick explanation of all the different columns:
+
+-   `trial_id` = unique id for individual trials
+-   `MAD` = maximal deviation into competitor space
+-   `AUC` = area under the curve
+-   `xpos_flips` = the amount of horizontal direction changes
+-   `RT` = reaction time in ms
+-   `prototype_label` = different categories of prototypical movement strategies
+-   `subject_id` = unique id for individual participants
+-   `group` = groups differ in the response design (click vs. touch)
+-   `condition` = category membership (Typical vs. Atypical)
+-   `exemplar` = the concrete animal
+-   `category_left` = the category displayed on the left
+-   `category_right` = the category displayed on the right
+-   `category_correct`= the category that is correct
+-   `response` = the selected category
+-   `correct` = whether or not the `response` matches `category_correct`
+
+# Some basic data wrangling
+
+Although the data set is already in good shape, here are some excursions into common steps to wrangle data (select, filter, reshape, summarize ...).
+
+## Selecting columns
+
+For now, we are only interested in columns `RT`, `group`, `condition`, `category_correct`, and `correct`. We can use the `select()` function of `dplyr` to get rid of columns we don't need.
+
+```{r}
+
+# selecting specific columns
+dolphin_selected <-
+  dolphin |>
+  dplyr::select(RT, group, condition, category_correct, correct)
+ 
+# let's have a look
+dolphin_selected
+
+```
+
+## Filtering rows
+
+If we care only about a subset of rows, we can use the `filter()` function. For example, let's filter all trials in which the correct category was either a `fish` or a `mammal`
+
+```{r}
+
+dolphin_filter1 <-
+  dolphin_selected |> 
+  filter(category_correct == "fish" | category_correct == "mammal")
+  # the | is a logical operator that indicates that either the first expression OR 
+  # the second one has to be true
+
+dolphin_filter1
+
+```
+
+You can also `filter()` *against* particular conditions. For example, let's filter all rows that do not have `bird` as their correct category:
+
+```{r}
+
+dolphin_filter2 <-
+  dolphin_selected |> 
+  filter(category_correct != "bird")
+
+dolphin_filter2
+
+```
+
+We can also filter according to multiple conditions at once, including numeric conditions. Here, we also filter for trials that have correct responses.
+
+```{r}
+
+dolphin_filter3 <-
+  dolphin_selected |> 
+  filter(category_correct != "bird",
+         correct == 1)
+
+dolphin_filter3
+
+```
+
+## Grouping and summarizing 
+
+We can also generate summary statistics of certain variables with a combination of `group_by()` & `summarise()`. Let's get the means and standard deviations of the reactions times for each level in the variable `condition`. We also include the minimum and maximum values for each condition.
+
+```{r}
+
+dolphin_aggregate <-
+  dolphin_filter3 |>
+  group_by(condition) |>
+  summarise(
+    min_RT  = min(RT),
+    mean_RT = mean(RT, na.rm = T),
+    sd_RT   = sd(RT, na.rm = T),
+    max_RT  = max(RT)
+    )
+  # the na.rm = T is an argument that is used to tell R that NAs should be ignored 
+  # when calculating the summary statistics
+
+# show the aggregated df
+dolphin_aggregate
+
+```
+
+So we find that atypical categories are responded to slower than typical categories. Makes sense. Identifying a dolphin as a mammal might be difficult because it shares a lot of features with fish.
+
+We can group according to many different factors simultaneously, and we can create multiple summary statistics at the same time. Here, we get summary statistics for each combination of all levels in variables `condition` and `group`. We use the `tidyboot` package to get bootstrapped 95% confidence intervalls. (Notice that these are more informative than standard deviations in the sense that they give an upper and lower deviation, not just one number for both directions, which can be misleading when the data is skewed (like reaction times typically are)):
+
+```{r aggregate2, warning = F, message=F}
+
+dolphin_aggregate2 <-
+  dolphin_filter3 |>
+  group_by(group, condition) |>
+  summarize(
+    lower_CI = tidyboot::ci_lower(RT),
+    mean_RT  = mean(RT, na.rm = T),
+    upper_CI = tidyboot::ci_upper(RT)
+    )
+
+# show the aggregated df
+dolphin_aggregate2
+
+```
+
+We can see here that the group that needed to click on a response are overall slower than touch responses, but also much more variable in their behavior.
+
+## Changing and adding columns
+
+Often, we are interested in standardized measures because we do not know what a value of 1 means on any given scale. Is 1 a large difference or a small difference? For example when we want to explore the impact of several predictors on the same measurement, we want to know the relative size of a number. To achieve this, we standardize measures by dividing their mean by their respective standard deviations. We will use the `scale()` function for this and create a new variable in our data frame via `mutate()`.
+
+(Note that the `scale()` function creates an object that is of the matrix class. That is fine for the most part but might create issues later on. To avoid any issues, we wrap the `scale()` function in `as.numeric()` to store the results as a numeric vector.)
+
+```{r standardize, warning = F, message=F}
+
+dolphin_standardize <-
+  dolphin_selected |>
+  mutate(RT_scale = as.numeric(scale(RT)))
+  
+head(dolphin_standardize)
+
+```
+
+If we now compare, say atypical and typical categories according to reaction times, we can use the standardized RT ratings. Let's do all of this in one "pipeline".
+
+```{r pipeline, warning = F, message=F}
+
+dolphin_agg_standardize <- dolphin_selected |>
+  mutate(RT_scale = scale(RT)) |> 
+  group_by(condition) |>
+  summarise(mean_RT_scale = mean(RT_scale, na.rm = T))
+  
+head(dolphin_agg_standardize)
+
+```
+
+Now we can see that atypical categories exhibit relatively higher RTs, i.e., more than 0.3 standard deviations higher than for typical categories.
+
+
+## Exercises for data wrangling 
+
+### Exercise 1
+
+::: callout-caution
+**Exercise 1a**
+
+Take the dolphin data set and store a reduced variant of it as `dolphin_reduced`. The new data frame should contain only the following columns: `RT`, `AUC`, `group`, and `exemplar`.
+
+:::
+
+
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+dolphin_reduced <- dolphin |>
+  select(RT, AUC, group, exemplar)
+
+head(dolphin_reduced)
+
+```
+::: callout-caution
+**Exercise 1b**
+
+We are for now only interested in those data that have whales as the exemplar. `filter()` only those rows and store them in a new dataframe called `whales_only`.
+
+:::
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+whales_only <- dolphin_reduced |> 
+  filter(exemplar == "whale")
+
+head(whales_only)
+
+```
+::: callout-caution
+**Exercise 1c**
+
+Now filter for only those data that have RTs below 1500ms.
+
+:::
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+
+whales_only2 <- whales_only |> 
+  filter(RT < 1500)
+
+head(whales_only2)
+
+```
+::: callout-caution
+**Exercise 1d**
+
+We don't like that `AUC` is unstandardized. Use `mutate()` to create a new vector that represents scaled AUC values (scaling is achieved by the function `scale()`).
+
+:::
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+whales_only_scaled <- whales_only2 |> 
+  mutate(AUC_scaled = scale(AUC))
+
+head(whales_only_scaled)
+
+```
+
+::: callout-caution
+**Exercise 1e**
+
+Calculate the mean scaled AUC ratings for both both groups.
+
+:::
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+whales_aggregate <- whales_only_scaled |> 
+  group_by(group) |> 
+  summarise(mean_AUC_scaled = mean(AUC_scaled, na.rm =TRUE))
+
+head(whales_aggregate)
+
+```
+
+::: callout-caution
+**Exercise 1f**
+
+Do all of the above (a-e) in one pipeline.
+
+:::
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+whales_aggregate <- dolphin |>
+  select(RT, AUC, group, exemplar) |> 
+  filter(exemplar == "whale",
+         RT < 1500) |> 
+  mutate(AUC_scaled = scale(AUC)) |> 
+  group_by(group) |> 
+  summarise(mean_AUC_scaled = mean(AUC_scaled, na.rm =TRUE))
+  
+head(whales_aggregate)
+
+```
+
+### Exercise 2 
+
+::: callout-caution
+**Exercise 1a**
+
+Take the dolphin data set and store a reduced variant of it. The new data frame should contain only the columns `condition`, `group`, and `xpos_flips`, `correct`. And within the `correct` vector, we are only interested in the correct trials (= 1). Filter accordingly.
+
+:::
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+dolphin_sub <- dolphin |> 
+  select(condition, group, xpos_flips, correct) |> 
+  filter(correct == 1)
+
+head(dolphin_sub)
+
+```
+::: callout-caution
+**Exercise 2b**
+
+Create an aggregated data frame that contains the mean `xpos_flips` value and the standard deviation for `group` and `condition`.
+
+:::
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+dolphin_agg <- dolphin_sub |>
+  group_by(group, condition) |> 
+  summarise(mean_xpos_flips = mean(xpos_flips, na.rm = TRUE),
+            sd_xpos_flips = sd(xpos_flips, na.rm = TRUE))
+
+head(dolphin_agg)
+
+```
+
+::: callout-caution
+**Exercise 2c**
+
+Use the `rename()` function to rename the new vectors for the mean `xflips` and their standard deviation to `xflips_mean` and `xflips_sd`.
+
+:::
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+dolphin_agg2 <- dolphin_agg |>
+  rename(xflips_mean = mean_xpos_flips,
+         xflips_sd = sd_xpos_flips)
+
+```
+
+::: callout-caution
+**Exercise 2d**
+
+Do all of the above (a-c) in one pipeline.
+
+:::
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+dolphin |> 
+  select(condition, group, xpos_flips, correct) |> 
+  filter(correct == 1) |> 
+  group_by(group, condition) |> 
+  summarise(mean_xpos_flips = mean(xpos_flips, na.rm = TRUE),
+            sd_xpos_flips = sd(xpos_flips, na.rm = TRUE)) |> 
+  rename(xflips_mean = mean_xpos_flips,
+         xflips_sd = sd_xpos_flips)
+
+```
+
+
+# Basic plotting with `ggplot2`
+
+To exercise with basic plotting functions, we first pick out a suitable subset of columns to work with:
+
+```{r subset}
+
+dolphin_subset <- dolphin |>
+  dplyr::select(group, condition, RT, AUC, exemplar)
+
+```
+
+In order to plot summary statistics of our data (such as means and standard deviations), we need to create a data object with aggregated values.
+
+```{r aggregate1}
+
+# first group by 'condition' and then calculate the mean and standard deviation (sd) of `RT`
+dolphin_agg <- dolphin_subset |>
+  group_by(condition) |>
+  summarise(
+    lower_CI = tidyboot::ci_lower(RT),
+    mean_RT = mean(RT),
+    upper_CI = tidyboot::ci_upper(RT)
+    )
+
+dolphin_agg
+
+```
+
+## Basic plots
+
+Now that we have pre-processed our data set, we are ready to visually explore it. Let's start very simple. Let's plot a bar plot. Let's also add a title to our plot.
+
+```{r barebar, fig.width = 7, fig.align="center"}
+
+ggplot(dolphin_agg, aes(x = condition, y = mean_RT)) +
+  geom_bar(stat = "identity") +
+  ggtitle("a bare bar plot")
+  # stat = "identity" takes the number in the dataset as the bar height (as opposed to a 'count')
+
+```
+
+
+Ugh! What an ugly plot, right? But it's already telling a story: Atypical categories are responded to slower than typical categories. Let's add a measure of uncertainty, in our case the bootstrapped 95% confidence intervals, as error bars to the plot:
+
+```{r}
+
+ggplot(dolphin_agg, aes(x = condition, y = mean_RT)) +
+  geom_bar(stat = "identity") + 
+  
+  # this is the added layer
+  geom_errorbar(aes(ymin = lower_CI, 
+                    ymax = upper_CI), 
+                colour = "black",
+                linewidth = 0.5) +
+  
+  ggtitle("a bare bar plot with error bars")
+    
+```
+
+We can observe a couple of things here. First, ggplot automatically adjust the axes based on the elements to be plotted unless we tell it not to. Second, the error bars are plotted *in front* of the bars, i.e. closer to the viewer. This visual ordering reflects the order of layers. We first plotted the bars and THEN the error bars. 
+
+Beyond bar plots, we can create other useful plots types. For example a point plot. Instead of a bar, we plot the mean RT as points.
+
+```{r point1, fig.width = 7, fig.align="center"}
+
+ggplot(dolphin_agg, aes(x = condition, y = mean_RT)) +
+  geom_errorbar(aes(ymin = lower_CI, 
+                    ymax = upper_CI), 
+                colour = "black") +  
+  # this is the new geom 
+  geom_point() +
+  ggtitle("a point plot")
+
+```  
+
+Or a line plot that connects the means with a line. For the line plot to work, we need to indicate a `group` aesthetic, i.e. the group that we want to connect with a line. If you have for example several interacting categories, you need to indicate which groups are supposed to be connected with lines (see below). Because we have only one group here, condition, we set `group` to `1`.
+
+```{r line1, fig.width = 7, fig.align="center"}
+
+ggplot(dolphin_agg, aes(x = condition, y = mean_RT, group = 1)) +
+  geom_line() +
+  ggtitle("a line plot")
+ 
+```
+
+Yay, we are on a roll. Let's plot a box plot. Remember the box shows the median (middle vertical line) and the interquartile range (the middle 50% of the data within the box). Note that for the box plot, we do not plot aggregated values, so we need to refer to the *entire* data set. We also add the aesthetic `fill` here and set it to the variable `condition` to color code our boxes.
+
+```{r box1, fig.width = 7, fig.align="center"}
+
+# we changed the dataset referred to
+ggplot(dolphin, aes(x = condition, y = RT, fill = condition)) +
+  # this is the new geom 
+  geom_boxplot() +
+  ggtitle("a box plot")
+
+```
+
+While the above plots illustrate one continuous variable (`RT`) plotted against a categorical variable (`condition`), we can also plot two continuous variables against each other. For example, we could plot `RT` against `AUC` in a scatter plot.
+
+```{r scatter1, warning = F, fig.width = 6, fig.align="center"}
+
+# we changed the y aesthetic to `Hardness`
+ggplot(dolphin_subset, aes(x = RT, y = AUC)) +
+  geom_point() +
+  ggtitle("a scatter plot")
+
+```
+
+Finally, one central plot type for our class. The density plot. It plots on the x-axis a continous value and on the y-axis the "density"" of these values. So high values on the y-axis means a lot of data at the corresponding x-values. The density curve can be outlined with `color` and filled with `fill`. To keep the two categories visually distinct, we add an argument to the `geom_density()` function: alpha. Alpha controls the transparency of the color! We will see a lot of these density plots in our class.
+
+```{r density1, warning = F, fig.width = 6, fig.align="center"}
+
+ggplot(dolphin, aes(x = RT, color = condition, fill = condition)) +
+  geom_density(alpha = 0.5) +
+  ggtitle("a density plot")
+
+```
+
+## Adjusting plot elements
+
+Okay, so we are now already capable of exploring our data visually with a bunch of plots. These plots are exceptionally ugly and of limited communicative value so far. Note that this is perfectly fine during an exploratory phase of data analysis. If we just eye-ball data and we have no trouble interpreting the plots, thats just fine. However, as soon as we want to communicate patterns to others with these graphs, we need to take a little bit more care of its communicative value. Let's look at ways we can tailor our plots to the needs of an audience.
+
+Let's go back to our bar plot and explore whether `condition` and `group` has an impact on `RT`?
+
+```{r bar3, fig.width = 4, fig.align="center"}
+
+# First we aggregate RT for group and condition
+dolphin_agg2 <- dolphin_subset |>
+  group_by(group, condition) |>
+  summarise(mean_RT = mean(RT),
+            sd_RT = sd(RT))
+
+# then we plot and color code for condition (note that, for bar plots, the aesthetic of `color` refers to the border of the bar, and `fill` refers to the actual colour of the bar)
+
+ggplot(dolphin_agg2, aes(x = condition, y = mean_RT, fill = group)) +
+  geom_bar(stat = "identity")
+
+```
+
+Hm... that doesn't work out, the bars are on top of each other, we need to tell ggplot to position the bars next to each other instead. We do that with position_dogde(). Note that ggplot assigns a default color coding scheme to your plots if you don't specify it by hand.
+  
+```{r bar4, fig.width = 6, fig.align="center"}
+
+ggplot(dolphin_agg2, aes(x = condition, y = mean_RT, fill = group)) +
+  geom_bar(stat = "identity", position = position_dodge())
+
+```
+
+Awww much better! Alternatively, we can plot the two categories into separate panels. We achieve this by facetting using the `facet_grid()` function.
+  
+```{r bar5, fig.width = 6, fig.align="center"}
+
+ggplot(dolphin_agg2, aes(x = group, y = mean_RT, fill = condition)) +
+  geom_bar(stat = "identity", position = position_dodge()) +
+  # this is the facetting function
+  facet_grid(~ condition)
+
+```
+
+Okay. We are getting somewhere. We already learned something again. Apparently, the effect of typiciality on RT is pretty similar across tasks. It does not look like we have an interaction here (more on interactions later).
+
+Now let's make these plots ready to communicate information. We add appropriate axes titles. Note that we are using a little hack here: The "\n" inserts an empty line, creating visual distance from axis title to axis, thus making it easier to read it. Our audience will thank us.
+
+```{r bar6, fig.width = 6, fig.align="center"}
+
+ggplot(dolphin_agg2, aes(x = group, y = mean_RT, fill = condition)) +
+  geom_bar(stat = "identity", position = position_dodge()) +
+  facet_grid(~ condition) +
+  # add axis titles
+  xlab("\n task") +
+    ylab("mean response latency in ms\n") 
+
+```
+
+The same graph as a point / line plot indicated to the audience whether there is an interaction pattern or not. Note that here we do not facet because we actually want the points to be plotted within the same horizontal space. We also have to specify the group aesthetic to tell ggplot which points to connect with lines.
+
+```{r line2, fig.width = 8, fig.align="center"}
+
+ggplot(dolphin_agg2, aes(x = group, y = mean_RT, color = condition, group = condition)) +
+  # instead of geom_bar we use geom_point and geom_line
+  geom_point(size = 12) +
+  geom_line(size = 2) +
+  xlab("\n task") +
+  ylab("mean response latency in ms\n") 
+  # # need to change to the color aesthetic instead of fill
+  # scale_y_continuous(expand = c(0, 0), breaks = (c(0, 500, 1000, 1500, 2000, 2500, 3000)), limits = c(0,3000))
+
+```
+
+These lines look pretty parallel and don't indicate a strong interaction pattern. But how do different exemplars differ? Let's aggregate for individual exemplars first and then create the same plot for the means of all exemplars.
+
+```{r line3, fig.width = 8, fig.align="center"}
+
+dolphin_agg3 <- dolphin_subset |> 
+  group_by(exemplar, group, condition) |> 
+  summarise(mean_RT = mean(RT, na.rm = TRUE))
+
+ggplot(dolphin_agg3, aes(x = group, y = mean_RT, color = condition, group = exemplar)) +
+  # instead of geom_bar we use geom_point and geom_line
+  geom_point(size = 6, alpha = 0.3) +
+  geom_line() +
+  geom_label(aes(label = exemplar)) +
+  xlab("\n task") +
+  ylab("mean response latency in ms\n")
+
+```
+
+It looks like "shark" and "rattlesnake" behave very different from their buddies in the `typical` condition. Interesting! We wouldn't have noticed if we had only looked at the overall means.
+
+## Exercises for plotting
+
+Take the scatter plot below as a departure point. It plots AUC (area-under-the-curve) against MAD (maximal absolute deviation). 
+
+```{r}
+
+ggplot(dolphin, aes(x = MAD, y = AUC)) +
+  geom_point() +
+  ggtitle("a scatter plot")
+
+```
+
+::: callout-caution
+**Exercise 3a**
+
+(1) Change both the x-axis and the y-axis title to sensible and informative titles.
+
+(2) Change the plot title to something informative.
+
+(3) Change the scaling of the x-axis to display only MAD values between -500 and 500
+
+:::
+
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+ggplot(dolphin, aes(x = MAD, y = AUC, 
+                           
+                           # (d) add color aesthetic
+                           color = group)) +
+  geom_point() +
+  
+  # (1) axes titles
+  xlab("\n maximal absolute deviation") +
+  ylab("area-under-the-curve \n") +
+  
+  # (2) change title
+  ggtitle("MAD is correlated with AUC") +
+
+  # (3) change x-axis (note that certain values are not displayed then. R will spit out a warning)
+  scale_x_continuous(limits = c(-500,500))
+
+```
+
+
+::: callout-caution
+**Exercise 4**
+
+
+(1) Plot AUC values as a function of group in a density plot (`geom_density`).
+
+(2)) Make the density curves semi-transparent with the `alpha` argument
+
+(3)) Add the aida_theme to the plot.
+
+(4) Add the mean values for both groups into the density plot as a line.
+
+:::
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solutions for a-c"
+
+# (1 - 3)
+ggplot(dolphin, aes(x = AUC, color = group, fill = group)) +
+  geom_density(alpha = 0.3) +
+  xlab("\n AUC")
+
+```
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution for d"
+
+# (4) aggregate means and add to plot
+
+dolphin_agg <- dolphin |>
+  group_by(group) |>
+  summarise(mean_AUC = mean(AUC, na.rm = TRUE),
+            sd_AUC = sd(AUC, na.rm = TRUE))
+
+# add them to the plot as vertical lines
+ggplot(dolphin, aes(x = AUC, color = group, fill = group)) +
+  geom_density(alpha = 0.3) +
+  xlab("\n AUC") +
+  # since the vertical line refers to dolphin_agg, we need to specify the dataset explicitly 
+  geom_vline(data = dolphin_agg, 
+             aes(xintercept = mean_AUC, color = group),
+             lty = "dashed") 
+ 
+```
+
+# Simple linear regression
+
+Let's use the `dolphin` data set to practice Bayesian linear regression modeling.
+This will help us understand general relationships between variables in this data set.
+Let's start by asking: **how is the area-under-the-curve (AUC) related to the maximum absolute deviation (MAD)?**
+We could hypothesize that they are strongly related, right? The more the cursor strives toward the competitor, the larger is the overall area under the curve.
+
+First, we will massage the data a little bit. We only want to look at those rows in which the participant selected the correct response. And instead of looking at all the data. We will only deal with the median values for each participant. Later in the class, we will see that there are good reasons for that. 
+
+## Data wrangling
+
+```{r}
+
+# aggregate
+dolphin_agg <- dolphin |> 
+  filter(correct == 1) |> 
+  group_by(subject_id) |> 
+  dplyr::summarize(AUC = median(AUC, na.rm = TRUE),
+            MAD = median(MAD, na.rm = TRUE)) 
+  
+# let's have a look
+head(dolphin_agg)
+```
+
+## Visual assessment
+
+Before we start thinking about statistical inference, we always want to get a feel for the data visually. You basically always want to plot the data.
+
+```{r}
+
+# plot
+ggplot(data = dolphin_agg, 
+       aes(x = MAD, 
+           y = AUC)) + 
+  geom_point(size = 3, alpha = 0.3) 
+  
+```
+
+This graph displays the distribution of AUC and MAD values.
+
+Looking at the plot, we can see that there is a strong relationship between AUC and MAD. And that makes a lot of sense. The larger the cursor strives toward the competitor, the larger is the overall area under the curve. Heureka! Our hypothesis is confirmed.
+
+But wait! As Bayesians, we would like to translate the data into an expression of **evidence**: do the data provide evidence for our research hypotheses? Also, notice that there is some variability. We want precise estimates of potential effects. We also want a measure of how certain we can be in these estimates.
+
+## Bayesian linear regression with `brms`
+
+The `brms` package allows us to run Bayesian regression models, both simple and rather complex. 
+It uses a sampling method, so its output will be vectors of (corellated) samples from the posterior distribution of the model's parameters.
+(We will learn how this sampling method works later).
+
+So, to quantify evidence and uncertainty with posterior samples, let's run a simple linear regression model using `brms`. We use the R notation that some of your might already be familiar with when using `lm()`. We specify a formula in which AUC is predicted by MAD.
+
+`AUC ~ MAD` 
+
+When you run this code, the `brms` package generated Stan code and runs the Stan program in the background. Stan code is executed in C++, and the model will be 'compiled' (you get information about this in the console output). We will learn later what this compilation does (spoiler: it computes gradients for all stochastic nodes in the model). The only thing that is relevant for you at the moment is this: This compilation can take up to 2 minutes or so before anything happens.
+
+```{r}
+#| output: false 
+  
+# specify the model 
+model1 = brm(
+  # model formula
+  AUC ~ MAD, 
+  # data
+  data = dolphin_agg
+  )
+```
+
+
+```{r}
+summary(model1)
+```
+
+The output of such a model looks very familiar if you have worked with lm() before. We want to look at what is here called "Population-Level Effects", which is a small table in this case. The first column contains the names of our coefficients; the `Estimate` column gives us the posterior mean of these coefficients; the `Est.Error` give us the standard error; the `l-95%`and `u-95%` give us the lower and upper limit of the 95% Credible Interval (henceforth CrI).
+The  column `Rhat` (R^) which is a diagnostic of chain convergence and should not diverge much from 1 (rule of thumb: should by <1.1). Again, more about that later.
+The `Bulk_ESS` and `Tail_ESS` columns give us numbers of "useful" samples. This number should be sufficiently high. If its not, `brms` will give you a convenient warning (more about that later, so don't worry for now). If that happens, you need to increase the chains and / or the number of iterations in order to increase the overall number of samples (again, don't worry for now). 
+
+The model output suggests that the Intercept is around ~550.
+The coefficient for MAD is estimated to be about ~450. What does this mean? 
+
+These values basically describe a line. A line can be described by an intercept (where the regression line crosses 0) and a slope (how the line develops). These particular point estimates for coefficients mean that when MAD is = 0, AUC is predicted to be ~550 (that is the intercept, i.e. where the regression line crosses 0). With each unit of MAD (+1), we need to add ~450 AUC units. This is the slope of the line. It is positive, so with higher MAD values, AUC values go up.
+
+To understand this better, we should manually draw this line into the graph from above.
+
+```{r}
+
+# extract model parameters:
+model_intercept <- summary(model1)$fixed[1,1]
+model_slope <- summary(model1)$fixed[2,1]
+
+# plot
+ggplot(data = dolphin_agg, 
+       aes(x = MAD, 
+           y = AUC)) + 
+  geom_abline(intercept = model_intercept, slope = model_slope, color = project_colors[2], size  = 1) +
+  geom_point(size = 3, alpha = 0.3, color = project_colors[1])
+  
+```
+
+Looking at the graph, it does make sense, right? The red line seems to capture the main trend pretty well.
+
+Now is there a relationship between AUC and MAD? What would it mean if there was *no* relationship between these two measures? Well no relationship would mean a slope of 0. How would that look like?
+
+```{r}
+
+# plot
+ggplot(data = dolphin_agg, 
+       aes(x = MAD, 
+           y = AUC)) + 
+  geom_abline(intercept = model_intercept, slope = model_slope, color = project_colors[2], size = 1) +
+  geom_abline(intercept = model_intercept, slope = 0, color = project_colors[3], size = 1, lty = "dashed") +
+  geom_point(size = 3, alpha = 0.3, color = project_colors[1])
+  
+```
+
+These lines look quite different indeed. But Bayesian data analysis does not give us only one single line. It gives us many different plausible lines. We just drew the posterior mean above. We demonstrate this concept in the next section by extracting the posteriors.
+
+## Extracting posterior distributions and plotting them
+
+We can interpret and visualize our coefficients immediately. We can create a data frame with all posterior samples for each parameter and plot those distributions for all coefficients. Let's first see what coefficients there are with the `get_variables()` function from the `tidybayes` package.
+
+```{r}
+
+# inspect parameters
+tidybayes::get_variables(model1)
+
+```
+
+Everything that is preceeded by a `b_` is a population level coefficients, i.e. our predictors. Now let's wrangle this data frame to get what we need. You don't have to entirely understand the following code, but make sure you understand it well enough to recycle it later on.
+
+```{r posteriors1}
+
+# wrangle data frame
+posteriors1 <- model1 |>
+  tidybayes::spread_draws(b_MAD, b_Intercept) |>
+  select(b_MAD, b_Intercept)
+
+posteriors1
+
+```
+
+Now that we know how to extract posterior samples, let's actually take a bunch of these samples and plot them as lines into our scatter plot from above. In this code chunk we generate a subsample of 100 random sample pairs. 
+
+```{r regressionLines, fig.width = 5, fig.align = "center"}
+
+# sample 100 random numbers from 4000 samples
+random_100 <- sample(1:4000, 100, replace = FALSE)
+  
+# wrangle data frame
+posteriors2 <- model1 |>
+  tidybayes::spread_draws(b_MAD, b_Intercept) |>
+  select(b_MAD, b_Intercept) |> 
+  # filter by the row numbers in random_100
+  slice(random_100)
+  
+# plot
+ggplot(data = dolphin_agg, 
+       aes(x = MAD, 
+           y = AUC)) + 
+  geom_abline(data = posteriors2,
+              aes(intercept = b_Intercept, slope = b_MAD), 
+              color = project_colors[2], size  = 0.1, alpha = 0.4) +
+  geom_point(size = 3, alpha = 0.3, color = project_colors[1]) +
+  theme_aida()
+  
+```
+
+Given our model, assumptions and data, these are 100 plausible regression lines. As you can see they are very similar.
+
+Using this pipeline we can also calculate the mean of the posteriors and any kind of Credible Interval (CrI). We first extract the posterior and bring them into a tidy form. Let's only look at the coefficient for MAD here.
+
+```{r posteriors2}
+
+# get posteriors for the relevant coefficients
+posteriors3 <- model1 |>
+  # use the spread_draws() function of tidybayes for all relevant parameters
+  tidybayes::spread_draws(b_MAD) |>
+  # select only those columns that are relevant
+  select(b_MAD) |> 
+  # bring into long format
+  gather(key = "parameter", value = "posterior")
+  
+head(posteriors3)
+
+```
+
+And then calculate the mean, the lower and the upper bound of a 90% CrI.
+
+```{r posteriors3}
+
+# get posteriors for the relevant coefficients
+posteriors3_agg <- posteriors3 |> 
+  group_by(parameter) |> 
+  summarise(
+    `90lowerCrI`   = HDInterval::hdi(posterior, credMass = 0.90)[1],
+    mean_posterior = mean(posterior),
+    `90higherCrI`  = HDInterval::hdi(posterior, credMass = 0.90)[2])
+
+posteriors3_agg 
+
+
+```
+
+Now we use this newly created data frame to plot the posterior distributions of all population-level coefficients. Again, we use our new best friend, the `tidybayes` package which offers some sweet extensions to `ggplot`'s `geom_` family of functions. We also add a reference point to compare the posteriors against. A common and reasonable reference point is 0. Remember a slope coefficient of zero would correspond to a flat regression line. 
+
+```{r}
+#| warning: false
+
+# plot the regression coefficients
+posteriors1 |> 
+  pivot_longer(cols = everything(), names_to = "parameter", values_to = "posterior") |> 
+  ggplot(aes(x = posterior, y = parameter, fill = parameter)) + 
+    # plot density 
+    tidybayes::geom_halfeyeh(.width = 0.95) +
+    # add axes titles
+    xlab("") +
+    ylab("") +
+    # adjust the x-axis 
+    scale_x_continuous(limits = c(-100,600)) +
+    # add line for the value zero
+    geom_segment(x = 0, xend = 0, y = Inf, yend = -Inf,
+                 lty = "dashed") +
+    theme(legend.position="none")
+
+```
+
+Here you see density plots for our critical coefficients of the model. We care mostly about the slope coefficient (b_MAD) (the posterior of which is shown in red).
+Values between ~420 and ~490 are plausible and they are indicated by the thick black line in the density plot for this coefficient. 
+The mean of the distribution is indicated by the thick black dot.
+
+That's helpful because we can relate this distribution to relevant values, for example the value 0 (dashed line). If you look at the coefficient, you can see that the posterior distribution does not include the value zero. In fact, the posterior is really far away from zero. Thus, given the data, the model and the priors (later more on that), we can be very certain that this coefficient is not zero. In other words, we would be very certain that there is a positive relationship between AUC and MAD (and in turn that 'no relationship' is not a very plausible scenario).
+
+The `brms` package allows us even to quickly evaluate how many posterior samples fall into a certain value range. Just for fun, let's calculate the amount of posterior samples that are larger than 450. The following code chunk does this for us:
+
+```{r posterior_probability}
+
+hypothesis(model1, 'MAD > 450')
+
+```
+The results tell us that about 62% of all posterior samples are larger than 450. This corresponds to a evidence ratio of 1.63: 0.62 / (1 - 0.62). So relating posterior samples to reference values allows us to quantify evidence in rather intuitive ways.
+
+
+## Exercises for simple regression modeling
+
+### Exercise 5
+
+::: callout-caution
+**Exercise 5a**
+
+Massage the data and create a new dataset that contains only correct responses and only the mean values of the RT and the AUC measurement for each participant (`subject_id`). Print out the `head` of the dataset.
+
+:::
+
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+# aggregate
+dolphin_agg <- dolphin |> 
+  filter(correct == 1) |> 
+  group_by(subject_id) |> 
+  dplyr::summarize(AUC = mean(AUC, na.rm = TRUE),
+            RT = mean(RT, na.rm = TRUE))
+  
+# let's have a look
+head(dolphin_agg)
+
+```
+
+We know from the previous exercises (walkthrough) that the area-under-the-curve (AUC) is related to the maximum absolute deviation (MAD).
+But what about reaction times (RTs)? Isn't it plausible that RTs are also related to AUC? The further I curve away from the target with the cursor, the longer it takes me to arrive at the target, right?
+
+::: callout-caution
+**Exercise 5b**
+
+Plot the relationship between RT and AUC in a scatterplot.
+
+:::
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+# plot
+ggplot(data = dolphin_agg, 
+       aes(x = RT, 
+           y = AUC)) + 
+  geom_point(size = 3, alpha = 0.3)
+  
+```
+
+::: callout-caution
+**Exercise 5c**
+
+Run a linear regression using `brms`. AUC is the dependent variable (i.e. the measure) and RT is the independent variables (i.e. the predictor). The formula writes: `AUC ~ RT`
+
+:::
+
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+# specify the model 
+model1 = brm(
+  # model formula
+  AUC ~ RT, 
+  # data
+  data = dolphin_agg
+  )
+
+summary(model1)
+
+```
+
+::: callout-caution
+**Exercise 5d**
+
+Look at the model output. Think of it in terms of a line in the scatterplot from (1b). Where does the regression line cross the y-axis, what is the slope of the line? Draw a scatterplot of AUC against RT and add the predicted values as a line.
+
+:::
+
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+# extract model parameters:
+model_intercept <- summary(model1)$fixed[1]
+model_slope <- summary(model1)$fixed[2]
+
+# plot
+ggplot(data = dolphin_agg, 
+       aes(x = RT, 
+           y = AUC)) + 
+  geom_abline(intercept = model_intercept, slope = model_slope, color = "darkred", size  = 2) +
+  geom_point(size = 3, alpha = 0.3) +
+  theme_aida()
+  
+```
+
+That doesn't really look like what we have expected, right? If there is any relationship, AUC values become lower with longer reaction times (the line has a negative slope).
+
+::: callout-caution
+**Exercise 5e**
+
+Now create a new dataframe which contains the extracted posteriors for `b_RT` from the model output (use the `spread_draws()` function). Print out the `head` of the new dataset.
+
+:::
+
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+# get posteriors for the relevant coefficients
+posteriors1 <- model1 |>
+  # use the spread_draws() function of tidybayes for all relevant parameters
+  spread_draws(b_RT) |>
+  # select only those columns that are relevant
+  select(b_RT) |> 
+  # bring into long format
+  gather(key = "parameter", value = "posterior")
+  
+head(posteriors1)
+
+```
+
+::: callout-caution
+**Exercise 5f**
+
+Plot the results with the `geom_halfeyeh() function. Add a vertical line at zero.
+
+:::
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+# plot the regression coefficients
+  ggplot(posteriors1, aes(x = posterior, y = parameter)) + 
+    # plot density 
+    geom_halfeyeh(.width = 0.95) +
+    # add axes titles
+    xlab("\nb_RT posterior distribution") +
+    ylab("") +
+    # adjust the x-axis 
+    scale_x_continuous(expand = c(0, 0), limits = c(-100,100)) +
+    # add line for the value zero
+    geom_segment(x = 0, xend = 0, y = Inf, yend = -Inf,
+                 lty = "dashed")
+
+```
+
+Now: What is the evidence telling us? Is there compelling evidence for a relationship between AUC and RT? Think about it.
+
+There is evidence for the relationship between AUC and RT, but it is weak at best. The value zero (no relationship) is contained in the 95% CrI and a non-trivial amount of posterior samples is larger than 0. 
+
+### Exercise 6
+
+::: callout-caution
+**Exercise 6a**
+
+Create a new dataframe that contains only the mean values of the RT, and MAD for each animal (`exemplar`) and for correct and incorrect responses. Print out the `head` of the new dataframe.
+
+:::
+
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+# aggregate
+dolphin_agg <- dolphin |> 
+  group_by(exemplar, correct) |> 
+  dplyr::summarize(MAD = mean(MAD, na.rm = TRUE),
+                   RT = mean(RT, na.rm = TRUE))
+  
+# let's have a look
+head(dolphin_agg)
+
+```
+
+::: callout-caution
+**Exercise 6b**
+
+Run a linear regression using brms. `MAD` is the dependent variable (i.e. the measure) and both `RT` and `correct` are independent variables (`MAD ~ RT + correct`). Tip: the coefficients might be really really small, so make sure the output is printed with enought numbers after the comma.
+
+:::
+
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+# specify the model 
+model2 = brm(
+  # model formula
+  MAD ~ RT + correct, 
+  # data
+  data = dolphin_agg
+  )
+
+print(summary(model2), digits = 5)
+
+```
+
+Try to understand the coefficient table. There is one coefficient for `RT` and one coefficient for `correct` which gives you the change in MAD from incorrect to correct responses.
+
+::: callout-caution
+**Exercise 6c**
+
+Plot a scatter plot of MAD ~ RT and color code it for correct responses (Tip: Make sure that `correct` is treated as a factor and not a numeric vector). Draw two predicted lines into the scatterplot. One for correct responses ("lightblue") and one for incorrect responses ("orange").
+
+:::
+
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+dolphin_agg$correct <- as.factor(as.character(dolphin_agg$correct))
+
+# extract model parameters:
+model_intercept <- summary(model2)$fixed[1]
+model_RT <- summary(model2)$fixed[2]
+model_correct <- summary(model2)$fixed[3]
+
+# plot
+ggplot(data = dolphin_agg, 
+       aes(x = RT, 
+           y = MAD,
+           color = correct)) + 
+  geom_abline(intercept = model_intercept, slope = model_RT, color = "orange", size  = 2) +
+  geom_abline(intercept = model_intercept + model_correct , slope = model_RT, color = "lightblue",size  = 2) +
+  geom_point(size = 3, alpha = 0.3) +
+  theme_aida()
+  
+```
+
+::: callout-caution
+**Exercise 6d**
+
+Extract the posteriors for the coefficients of both `RT` and `correct` from the model output (use the `spread_draws()` function), calculate their means and a 67% Credible Interval. Print out the `head` of the aggregated dataframe.
+
+:::
+
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+# get posteriors for the relevant coefficients
+posteriors2 <- model2 |>
+  spread_draws(b_RT, b_correct) |>
+  select(b_RT, b_correct) |> 
+  gather(key = "parameter", value = "posterior")
+
+# aggregate
+posteriors2_agg <- posteriors2 |> 
+  group_by(parameter) |> 
+  summarise(mean_posterior = mean(posterior),
+            `67lowerCrI` = HDInterval::hdi(posterior, credMass = 0.67)[1],
+            `67higherCrI` = HDInterval::hdi(posterior, credMass = 0.67)[2]
+            )
+
+# print out
+posteriors2_agg
+  
+```
+
+::: callout-caution
+**Exercise 6e**
+
+Plot the scatterplot from 2c and plot 50 sample tuples for the regression lines for correct and incorrect responses.
+
+:::
+
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+# sample 50 random numbers from 4000 samples
+random_50 <- sample(1:4000, 50, replace = FALSE)
+  
+# wrangle data frame
+posteriors3 <- model2 |>
+  spread_draws(b_Intercept, b_RT, b_correct) |>
+  select(b_Intercept, b_RT, b_correct) |> 
+  # filter by the row numbers in random_50
+  slice(random_50)
+  
+# plot
+ggplot(data = dolphin_agg, 
+       aes(x = RT, 
+           y = MAD, 
+           color = correct)) + 
+  geom_abline(data = posteriors3,
+              aes(intercept = b_Intercept, slope = b_RT), 
+              color = "orange", size  = 0.1) +
+  geom_abline(data = posteriors3,
+              aes(intercept = b_Intercept + b_correct, slope = b_RT), 
+              color = "lightblue", size  = 0.1) +
+  geom_point(size = 3, alpha = 0.3) +
+  theme_aida()
+
+```
+
+::: callout-caution
+**Exercise 6f**
+
+Given our model and our data, calculate the evidential ratio of correct responses exhibiting larger MADs than incorrect responses.
+
+:::
+
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+hypothesis(model2, 'correct > 0')
+
+```
+
+
+
+
+
+
+
