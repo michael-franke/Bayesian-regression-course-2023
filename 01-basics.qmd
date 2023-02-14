@@ -1,0 +1,11 @@
+---
+title: "Bayesian Regression: Theory & Practice"
+subtitle: "Basics: Bayesian Data Analysis, Wrangling, Plotting, and Linear Regression"
+author: "Michael Franke"
+---
+
+The first session introduces the basics of BDA and linear regression modeling.
+We will also have a first rendez-vous with the data set which most of our hands-on monkeying will be based on.
+This also allows to recap a bit of wrangling and plotting in the tidyverse.
+
+Here are [slides for session 1](slides/01-slides.pdf).
