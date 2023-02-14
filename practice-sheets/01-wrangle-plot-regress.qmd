@@ -36,6 +36,7 @@ dolphin <- aida::data_MT
 To get some information about the data set, we can use the `help` function:
 
 ```{r}
+#| eval: false
 help("data_MT")
 ```
 
