@@ -17,104 +17,64 @@ callout-appearance: simple
 dolphin <- aida::data_MT
 ```
 
-# Prior and posterior predictives
+# Exercises: categorical predictors
 
-Here is an example for how we can obtain draws from the posterior predictive distribution using `tidybayes::predicted_draws`. We are using the fit of a linear model to the average world temperature for the year 2025 to 2024.
+We want to regress `log RT` against the full combination of categorical factors `group`, `condition`, and `prototype_label`.
+
+`log RT ~ group * condition * prototype_label`
+
+The research hypotheses we would like to investigate are:
+
+1.  Typical trials are faster than atypical ones.
+2.  CoM trials are slower than the other kinds of trials (straight and curved) together, and respectively.
+3.  'straight' trials are faster than 'curved' trials.
+4.  Click trials are slower than touch trials.
+
+But for this to work (without at least mildly informative priors), we would need to have a sufficient amount of observations in each cell. So, let's check:
 
 ```{r}
-
-plot_predictPriPost <- function(prior_spec, ndraws = 1000) {
-  
-  # get the posterior fit
-  fit <- brm(
-    avg_temp ~ year,
-    prior = prior_spec,
-    data = aida::data_WorldTemp,
-    silent = TRUE,
-    refresh = 0
-  )
-  
-  # retrieve prior samples from the posterior fit
-  fit_prior_only <- update(
-    fit,
-    silent = TRUE,
-    refresh = 0,
-    sample_prior = "only"
-  )
-  
-  get_predictions <- function(fit_object, type = "prior prediction") {
-    
-    tidybayes::add_linpred_draws(
-      fit_object, 
-      newdata = tibble(year = aida::data_WorldTemp$year),
-      ndraws = ndraws,
-      value = 'avg_tmp'
-    ) |> 
-      ungroup() |> 
-      select(year, .draw, avg_tmp) |> 
-      mutate(type = type)
-    
-  }
-  
-  get_predictions(fit, "posterior prediction") |> 
-    rbind(get_predictions(fit_prior_only, "prior prediction")) |> 
-    mutate(type = factor(type, levels = c("prior prediction", "posterior prediction"))) |> 
-    ggplot() + 
-    facet_grid(type ~ ., scales = "free") +
-    geom_line(aes(x = year, y = avg_tmp, group = .draw), 
-              color = "gray", alpha = 0.3) +
-    geom_point(data = aida::data_WorldTemp, 
-               aes(x = year, y = avg_temp), color = project_colors[2], size = 1, alpha = 0.8) +
-    ylab("average temperature")
-}
-
-prior_baseline <- c(prior("normal(0, 0.02)", class = "b"),
-                    prior("student_t(3, 8, 5)", class = "Intercept"))
-
-prior_opinionated <- c(prior("normal(0.2, 0.05)", class = "b"),
-                       prior("student_t(3, 8, 5)", class = "Intercept"))
-
-prior_crazy <- c(prior("normal(-1, 0.005)", class = "b"),
-                 prior("student_t(3, 8, 5)", class = "Intercept"))
-
-plot_predictPriPost(prior_baseline)
-# ggsave("pics/02a-predictives-baseline.pdf", width = 5, height = 8)
-
-plot_predictPriPost(prior_opinionated)
-# ggsave("pics/02b-predictives-opinionated.pdf", width = 5, height = 8)
-
-plot_predictPriPost(prior_crazy)
-# ggsave("pics/02c-predictives-crazy.pdf", width = 5, height = 8)
-
+dolphin |> 
+  mutate(group = as_factor(group),
+         condition = as_factor(condition),
+         prototype_label = as_factor(prototype_label)) |> 
+  count(group, condition, prototype_label, .drop = FALSE) |> 
+  arrange(n)
 ```
 
-::: callout-caution
-**Exercise 0**
+So, there are cells for which we have no observations at all. For simplicity, we therefore just lump all "change of mind"-type trajectories into one category:
 
-Play around with different prior specifications, and inspect the resulting prior and posterior predictions.
-:::
+```{r}
+dolphin_prepped <- 
+  dolphin |> 
+  mutate(
+    prototype_label = case_when(
+     prototype_label %in% c('curved', 'straight') ~ prototype_label,
+     TRUE ~ 'CoM'
+    ),
+    prototype_label = factor(prototype_label,
+                             levels = c('straight', 'curved', 'CoM')))
 
-# Exercises: linear regression w/ metric & categorical predictor
+dolphin_prepped |> 
+  select(RT, prototype_label)
+```
 
-## Exercise 1:
+Here is a plot of the data to be analyzed:
 
-Here is an aggregated data set `dolphin_agg` for you.
-
-```{r exercise1}
-
-# aggregate
-dolphin_agg <- dolphin %>% 
-  group_by(group, exemplar) %>% 
-  dplyr::summarize(MAD = median(MAD, na.rm = TRUE),
-                   RT = median(RT, na.rm = TRUE)) %>% 
-  mutate(log_RT = log(RT))
-
+```{r}
+dolphin_prepped |> 
+  ggplot(aes(x = log(RT), fill = condition)) +
+  geom_density(alpha = 0.4) +
+  facet_grid(group ~ prototype_label)
 ```
 
 ::: callout-caution
 **Exercise 1a**
 
-Standardize ("z-transform") `log_RT` such that the mean is at zero and 1 unit corresponds to the standard deviation. Name it `log_RT_s`.
+Use `brm()` to run a linear regression model for the data set `dolphin_prepped` and the formula:
+
+`log RT ~ group * condition * prototype_label`
+
+Set the prior for all population-level slope coefficients to a reasonable, weakly-informative but unbiased prior.
 :::
 
 ```{r}
@@ -122,34 +82,48 @@ Standardize ("z-transform") `log_RT` such that the mean is at zero and 1 unit co
 #| code-fold: true
 #| code-summary: "Show solution"
 
-dolphin_agg$log_RT_s <- scale(dolphin_agg$log_RT, scale = TRUE)
-
+fit <- brm(
+  formula = log(RT) ~ group * condition * prototype_label,
+  prior   = prior(student_t(1, 0, 3), class = "b"),
+  data    = dolphin_prepped
+  )
 ```
 
 ::: callout-caution
 **Exercise 1b**
 
-Run a linear model with `brms` that predicts `MAD` based on `log_RT_s`, `group`, and their two-way interaction. Run 2000 iterations and 6 chains.
+Plot the posteriors for population-level slope coefficients using the `tidybayes` package in order to:
+
+1.  determine which combination of factor levels is the default cell
+2.  check which coefficients have 95% CIs that do *not* include zero
+3.  try to use this latter information to address any of our research hypotheses (stated above)
 :::
 
 ```{r}
 #| eval: false
 #| code-fold: true
 #| code-summary: "Show solution"
+tidybayes::summarise_draws(fit)
+tidybayes::gather_draws(fit, `b_.*`, regex = TRUE) |> 
+  filter(.variable != "b_Intercept") |> 
+  ggplot(aes(y = .variable, x = .value)) +
+  tidybayes::stat_halfeye() +
+  labs(x = "", y = "") +
+  geom_segment(x = 0, xend = 0, y = Inf, yend = -Inf,
+               lty = "dashed")
 
-model1 = brm(
-  MAD ~ log_RT_s * group, 
-  data = dolphin_agg,
-  iter = 2000,
-  chains = 6
-  )
+# the default cell is for click-atypical-straight
 
+# coeffiencents with 95% CIs that do not include zero are:
+#   grouptouch, conditionTypical, prototype_labelCoM
+
+# none of these give us direct information about our research hypotheses
 ```
 
 ::: callout-caution
 **Exercise 1c**
 
-Plot `MAD` (y) against `log_RT_s` (x) in a scatter plot and color-code for `group`. Plot the regression lines for the click and the touch group into the plot and don't forget to take possible interactions into account.
+Use the `faintr` package to get information relevant for the current research hypotheses. Interpret each result with respect to what we may conclude from it.
 :::
 
 ```{r}
@@ -157,89 +131,55 @@ Plot `MAD` (y) against `log_RT_s` (x) in a scatter plot and color-code for `grou
 #| code-fold: true
 #| code-summary: "Show solution"
 
-# extract posterior means for model coefficients
-Intercept = summary(model1)$fixed[1,1]
-log_RT = summary(model1)$fixed[2,1]
-group = summary(model1)$fixed[3,1]
-interaction = summary(model1)$fixed[4,1]
+# 1. Typical trials are faster than atypical ones.
+# -> There is overwhelming evidence that this is true 
+#    (given the data and the model).
 
-# plot
-ggplot(data = dolphin_agg, 
-       aes(x = log_RT_s, 
-           y = MAD, 
-           color = group)) + 
-  geom_point(size = 3, alpha = 0.3) +
-  geom_vline(xintercept = 0, lty = "dashed") +
-  geom_abline(intercept = Intercept, slope = log_RT, color = "#E69F00", size = 2) +
-  geom_abline(intercept = Intercept + group, slope = log_RT + interaction, color = "#56B4E9", size = 2) 
-
-```
-
-::: callout-caution
-**Exercise 1d**
-
-Specify very skeptic priors for all three coefficients. Use a normal distribution with mean = 0, and sd = 10. Rerun the model with those priors.
-:::
-
-```{r}
-#| eval: false
-#| code-fold: true
-#| code-summary: "Show solution"
-
-# specify priors
-priors_model2 <- c(
-  set_prior("normal(0,10)", class = "b", coef = "log_RT_s"),
-  set_prior("normal(0,10)", class = "b", coef = "grouptouch"),
-  set_prior("normal(0,10)", class = "b", coef = "log_RT_s:grouptouch")
+faintr::compare_groups(
+  fit,
+  lower  = condition == 'Typical',
+  higher = condition == 'Atypical'
 )
 
-# model
-model2 = brm(
-  MAD ~ log_RT_s * group, 
-  data = dolphin_agg,
-  iter = 2000,
-  chains = 6,
-  prior = priors_model2
-  )
+# 2. CoM trials are slower than the other kinds of trials 
+#    (straight and curved) together, and respectively.
+# -> There is overwhelming evidence that this is true 
+#    (given the data and the model).
 
+faintr::compare_groups(
+  fit,
+  lower  = prototype_label != 'CoM',
+  higher = prototype_label == 'CoM'
+)
+
+faintr::compare_groups(
+  fit,
+  lower  = prototype_label == 'straight',
+  higher = prototype_label == 'CoM'
+)
+
+# 3. 'straight' trials are faster than 'curved' trials.
+# -> There is no evidence for this hypothesis
+#    (given the data and the model).
+
+faintr::compare_groups(
+  fit,
+  lower  = prototype_label == 'straight',
+  higher = prototype_label == 'curved'
+)
+
+# 4. Click trials are slower than touch trials.
+# -> There is overwhelming evidence that this is true 
+#    (given the data and the model).
+
+faintr::compare_groups(
+  fit,
+  lower  = group == 'touch',
+  higher = group == 'click'
+)
 ```
 
-::: callout-caution
-**Exercise 1e**
-
-Compare the model output of model1 to model2. What are the differences and what are the reasons for these differences?
-:::
-
-```{r}
-#| eval: false
-#| code-fold: true
-#| code-summary: "Show solution"
-
-# We can compare the model predictions by looking at the coefficients / plotting them:
-summary(model1)
-summary(model2)
-
-# extract posterior means for model coefficients
-Intercept = summary(model2)$fixed[1,1]
-log_RT = summary(model2)$fixed[2,1]
-group = summary(model2)$fixed[3,1]
-interaction = summary(model2)$fixed[4,1]
-
-# plot
-ggplot(data = dolphin_agg, 
-       aes(x = log_RT_s, 
-           y = MAD, 
-           color = group)) + 
-  geom_point(size = 3, alpha = 0.3) +
-  geom_vline(xintercept = 0, lty = "dashed") +
-  geom_abline(intercept = Intercept, slope = log_RT, color = "#E69F00", size = 2) +
-  geom_abline(intercept = Intercept + group, slope = log_RT + interaction, color = "#56B4E9", size = 2) 
-
-# ANSWER: the magnitude of the coefficients is much smaller in model2, with the interaction term being close to zero. As a result, the lines in the plot are closer together and run in parallel. The reason for this change lies in the priors. We defined the priors of model2 rather narrowly, down weighing  data points larger or smaller than zero. This is a case of the prior dominating the posterior.
-
-```
-
-## Exercise 2
+## Exercises: metric and categorical predictors
 
 Here is an aggregated data set `dolphin_agg2` for you.
 
@@ -597,164 +537,3 @@ ggplot(posteriors_all, aes(x = posterior, y = parameter, fill = model, color = m
 
 ```
 
-# Exercises: categorical predictors
-
-We want to regress `log RT` against the full combination of categorical factors `group`, `condition`, and `prototype_label`.
-
-`log RT ~ group * condition * prototype_label`
-
-The research hypotheses we would like to investigate are:
-
-1.  Typical trials are faster than atypical ones.
-2.  CoM trials are slower than the other kinds of trials (straight and curved) together, and respectively.
-3.  'straight' trials are faster than 'curved' trials.
-4.  Click trials are slower than touch trials.
-
-But for this to work (without at least mildly informative priors), we would need to have a sufficient amount of observations in each cell. So, let's check:
-
-```{r}
-dolphin |> 
-  mutate(group = as_factor(group),
-         condition = as_factor(condition),
-         prototype_label = as_factor(prototype_label)) |> 
-  count(group, condition, prototype_label, .drop = FALSE) |> 
-  arrange(n)
-```
-
-So, there are cells for which we have no observations at all. For simplicity, we therefore just lump all "change of mind"-type trajectories into one category:
-
-```{r}
-dolphin_prepped <- 
-  dolphin |> 
-  mutate(
-    prototype_label = case_when(
-     prototype_label %in% c('curved', 'straight') ~ prototype_label,
-     TRUE ~ 'CoM'
-    ),
-    prototype_label = factor(prototype_label,
-                             levels = c('straight', 'curved', 'CoM')))
-
-dolphin_prepped |> 
-  select(RT, prototype_label)
-```
-
-Here is a plot of the data to be analyzed:
-
-```{r}
-dolphin_prepped |> 
-  ggplot(aes(x = log(RT), fill = condition)) +
-  geom_density(alpha = 0.4) +
-  facet_grid(group ~ prototype_label)
-```
-
-::: callout-caution
-**Exercise 3a**
-
-Use `brm()` to run a linear regression model for the data set `dolphin_prepped` and the formula:
-
-`log RT ~ group * condition * prototype_label`
-
-Set the prior for all population-level slope coefficients to a reasonable, weakly-informative but unbiased prior.
-:::
-
-```{r}
-#| eval: false
-#| code-fold: true
-#| code-summary: "Show solution"
-
-fit <- brm(
-  formula = log(RT) ~ group * condition * prototype_label,
-  prior   = prior(student_t(1, 0, 3), class = "b"),
-  data    = dolphin_prepped
-  )
-```
-
-::: callout-caution
-**Exercise 3b**
-
-Plot the posteriors for population-level slope coefficients using the `tidybayes` package in order to:
-
-1.  determine which combination of factor levels is the default cell
-2.  check which coefficients have 95% CIs that do *not* include zero
-3.  try to use this latter information to address any of our research hypotheses (stated above)
-:::
-
-```{r}
-#| eval: false
-#| code-fold: true
-#| code-summary: "Show solution"
-tidybayes::summarise_draws(fit)
-tidybayes::gather_draws(fit, `b_.*`, regex = TRUE) |> 
-  filter(.variable != "b_Intercept") |> 
-  ggplot(aes(y = .variable, x = .value)) +
-  tidybayes::stat_halfeye() +
-  labs(x = "", y = "") +
-  geom_segment(x = 0, xend = 0, y = Inf, yend = -Inf,
-               lty = "dashed")
-
-# the default cell is for click-atypical-straight
-
-# coeffiencents with 95% CIs that do not include zero are:
-#   grouptouch, conditionTypical, prototype_labelCoM
-
-# none of these give us direct information about our research hypotheses
-```
-
-::: callout-caution
-**Exercise 3c**
-
-Use the `faintr` package to get information relevant for the current research hypotheses. Interpret each result with respect to what we may conclude from it.
-:::
-
-```{r}
-#| eval: false
-#| code-fold: true
-#| code-summary: "Show solution"
-
-# 1. Typical trials are faster than atypical ones.
-# -> There is overwhelming evidence that this is true 
-#    (given the data and the model).
-
-faintr::compare_groups(
-  fit,
-  lower  = condition == 'Typical',
-  higher = condition == 'Atypical'
-)
-
-# 2. CoM trials are slower than the other kinds of trials 
-#    (straight and curved) together, and respectively.
-# -> There is overwhelming evidence that this is true 
-#    (given the data and the model).
-
-faintr::compare_groups(
-  fit,
-  lower  = prototype_label != 'CoM',
-  higher = prototype_label == 'CoM'
-)
-
-faintr::compare_groups(
-  fit,
-  lower  = prototype_label == 'straight',
-  higher = prototype_label == 'CoM'
-)
-
-# 3. 'straight' trials are faster than 'curved' trials.
-# -> There is no evidence for this hypothesis
-#    (given the data and the model).
-
-faintr::compare_groups(
-  fit,
-  lower  = prototype_label == 'straight',
-  higher = prototype_label == 'curved'
-)
-
-# 4. Click trials are slower than touch trials.
-# -> There is overwhelming evidence that this is true 
-#    (given the data and the model).
-
-faintr::compare_groups(
-  fit,
-  lower  = group == 'touch',
-  higher = group == 'click'
-)
-```

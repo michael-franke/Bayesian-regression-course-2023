@@ -12,17 +12,21 @@ website:
       - section: "01: Basics"
         contents:
           - href: 01-basics.qmd
-            text: BDA & regression
+            text: Overview
           - href: practice-sheets/01a-wrangling-plotting.qmd
             text: Wrangling & plotting
           - href: practice-sheets/01b-simple-regression.qmd
             text: Simple linear regression
-      - section: "02: priors & categorical predictors"
+      - section: "02: Priors, predictions & categorical predictors"
         contents:
           - href: 02-priorPredictives-categPredictors.qmd
-            text: priors, predictions, & categorical predictors
-          - href: practice-sheets/02-pregression-factors.qmd
-            text: Practice sheet 2
+            text: Overview
+          - href: practice-sheets/02a-predictives.qmd
+            text: Prior & posterior predictives
+          - href: practice-sheets/02b-linReg-single-catPredictor.qmd
+            text: Regression w/ single categorical predictor
+          - href: practice-sheets/02c-linReg-multiple-catPredictors.qmd
+            text: Regression w/ multiple categorical predictors
 
 format:
   html:

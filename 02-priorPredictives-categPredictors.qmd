@@ -1,6 +1,6 @@
 ---
 title: "Bayesian Regression: Theory & Practice"
-subtitle: "Priors, prior & posterior predictions, and categorical predictors"
+subtitle: "Session 2: Priors, prior & posterior predictions, and categorical predictors"
 author: "Michael Franke"
 ---
 
