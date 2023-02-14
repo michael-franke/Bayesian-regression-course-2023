@@ -13,8 +13,10 @@ website:
         contents:
           - href: 01-basics.qmd
             text: BDA & regression
-          - href: practice-sheets/01-wrangle-plot-regress.qmd
-            text: Practice sheet 1
+          - href: practice-sheets/01a-wrangling-plotting.qmd
+            text: Wrangling & plotting
+          - href: practice-sheets/01b-simple-regression.qmd
+            text: Simple linear regression
       - section: "02: priors & categorical predictors"
         contents:
           - href: 02-priorPredictives-categPredictors.qmd

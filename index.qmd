@@ -3,8 +3,8 @@ title: "Bayesian Regression: Theory & Practice"
 author: "Michael Franke"
 ---
 
-This site provides course material for an introductory-level course on Bayesian linear regression modeling.
-The course presupposes prior exposure to (frequentist) statistics and some acquaintance with R.
+This site provides material for an introductory-level course on Bayesian linear regression modeling.
+The course presupposes some prior exposure to statistics and some acquaintance with R.
 
 ## Intended audience
 
@@ -17,7 +17,7 @@ Starting with simple linear regression, we want to reach a basic understanding o
 
 ## Additional material
 
-An even more basic introduction to data analysis (introducing R, tidyvers, Bayesian and, eventually, also frequentist statistics) is this [webbook "An introduction to Data Analysis"](https://michael-franke.github.io/intro-data-analysis/index.html).
+An even more basic introduction to data analysis (introducing R, tidyvers, Bayesian and, eventually, also frequentist statistics) is the webbook ["An introduction to Data Analysis"](https://michael-franke.github.io/intro-data-analysis/index.html).
 
 ## Acknowledgements
 

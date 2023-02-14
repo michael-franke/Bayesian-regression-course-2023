@@ -1,6 +1,4 @@
-# Preparing: packages & global options
-
-Here is code to install the packages necessary for the course.
+Here is code to load (and if necessary, install) required packages, and to set some global options (for plotting and efficient fitting of Bayesian models).
 
 ```{r}
 #| warning: false
@@ -29,26 +27,12 @@ if (! "faintr" %in% pckgs_installed) {
 if (! "cspplot" %in% pckgs_installed) {
   remotes::install_github("CogSciPrag/cspplot")
 }
-```
 
-Next, we load the required packages.
-
-```{r}
-#| warning: false
-#| output: false
-#| code-fold: true
-
+# load the required packages
 x <- lapply(pckgs_needed, library, character.only = TRUE)
 library(aida)
 library(faintr)
 library(cspplot)
-
-```
-
-We may also want to set the following options for later use.
-
-```{r}
-#| code-fold: true
 
 # these options help Stan run faster
 options(mc.cores = parallel::detectCores())
