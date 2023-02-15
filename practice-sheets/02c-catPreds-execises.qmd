@@ -1,6 +1,6 @@
 ---
 title: "Bayesian regression: theory & practice"
-subtitle: "02: Simple linear regression & categorical predictors"
+subtitle: "02b: Simple linear regression & categorical predictors"
 author: "Michael Franke & Timo Roettger"
 format: html
 editor: visual
@@ -10,14 +10,175 @@ execute:
   message: false
 callout-appearance: simple
 ---
-
 {{< include 00-preamble.qmd >}}
 
 ```{r}
 dolphin <- aida::data_MT
 ```
 
-# Exercises: linear regression w/ metric & categorical predictor
+# Regression w multiple categorical predictors
+
+We want to regress `log RT` against the full combination of categorical factors `group`, `condition`, and `prototype_label`.
+
+`log RT ~ group * condition * prototype_label`
+
+The research hypotheses we would like to investigate are:
+
+1.  Typical trials are faster than atypical ones.
+2.  CoM trials are slower than the other kinds of trials (straight and curved) together, and respectively.
+3.  'straight' trials are faster than 'curved' trials.
+4.  Click trials are slower than touch trials.
+
+But for this to work (without at least mildly informative priors), we would need to have a sufficient amount of observations in each cell. So, let's check:
+
+```{r}
+dolphin |>
+  mutate(group = as_factor(group),
+         condition = as_factor(condition),
+         prototype_label = as_factor(prototype_label)) |>
+  count(group, condition, prototype_label, .drop = FALSE) |>
+  arrange(n)
+```
+
+So, there are cells for which we have no observations at all. For simplicity, we therefore just lump all "change of mind"-type trajectories into one category:
+
+```{r}
+dolphin_prepped <-
+  dolphin |>
+  mutate(
+    prototype_label = case_when(
+     prototype_label %in% c('curved', 'straight') ~ prototype_label,
+     TRUE ~ 'CoM'
+    ),
+    prototype_label = factor(prototype_label,
+                             levels = c('straight', 'curved', 'CoM')))
+
+dolphin_prepped |>
+  select(RT, prototype_label)
+```
+
+Here is a plot of the data to be analyzed:
+
+```{r}
+dolphin_prepped |>
+  ggplot(aes(x = log(RT), fill = condition)) +
+  geom_density(alpha = 0.4) +
+  facet_grid(group ~ prototype_label)
+```
+
+::: callout-caution
+**Exercise 1a**
+
+Use `brm()` to run a linear regression model for the data set `dolphin_prepped` and the formula:
+
+`log RT ~ group * condition * prototype_label`
+
+Set the prior for all population-level slope coefficients to a reasonable, weakly-informative but unbiased prior.
+:::
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+fit <- brm(
+  formula = log(RT) ~ group * condition * prototype_label,
+  prior   = prior(student_t(1, 0, 3), class = "b"),
+  data    = dolphin_prepped
+  )
+```
+
+::: callout-caution
+**Exercise 1b**
+
+Plot the posteriors for population-level slope coefficients using the `tidybayes` package in order to:
+
+1.  determine which combination of factor levels is the default cell
+2.  check which coefficients have 95% CIs that do *not* include zero
+3.  try to use this latter information to address any of our research hypotheses (stated above)
+:::
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+tidybayes::summarise_draws(fit)
+tidybayes::gather_draws(fit, `b_.*`, regex = TRUE) |>
+  filter(.variable != "b_Intercept") |>
+  ggplot(aes(y = .variable, x = .value)) +
+  tidybayes::stat_halfeye() +
+  labs(x = "", y = "") +
+  geom_segment(x = 0, xend = 0, y = Inf, yend = -Inf,
+               lty = "dashed")
+
+# the default cell is for click-atypical-straight
+
+# coeffiencents with 95% CIs that do not include zero are:
+#   grouptouch, conditionTypical, prototype_labelCoM
+
+# none of these give us direct information about our research hypotheses
+```
+
+::: callout-caution
+**Exercise 1c**
+
+Use the `faintr` package to get information relevant for the current research hypotheses. Interpret each result with respect to what we may conclude from it.
+:::
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+# 1. Typical trials are faster than atypical ones.
+# -> There is overwhelming evidence that this is true
+#    (given the data and the model).
+
+faintr::compare_groups(
+  fit,
+  lower  = condition == 'Typical',
+  higher = condition == 'Atypical'
+)
+
+# 2. CoM trials are slower than the other kinds of trials
+#    (straight and curved) together, and respectively.
+# -> There is overwhelming evidence that this is true
+#    (given the data and the model).
+
+faintr::compare_groups(
+  fit,
+  lower  = prototype_label != 'CoM',
+  higher = prototype_label == 'CoM'
+)
+
+faintr::compare_groups(
+  fit,
+  lower  = prototype_label == 'straight',
+  higher = prototype_label == 'CoM'
+)
+
+# 3. 'straight' trials are faster than 'curved' trials.
+# -> There is no evidence for this hypothesis
+#    (given the data and the model).
+
+faintr::compare_groups(
+  fit,
+  lower  = prototype_label == 'straight',
+  higher = prototype_label == 'curved'
+)
+
+# 4. Click trials are slower than touch trials.
+# -> There is overwhelming evidence that this is true
+#    (given the data and the model).
+
+faintr::compare_groups(
+  fit,
+  lower  = group == 'touch',
+  higher = group == 'click'
+)
+```
+
+# Regression w/ metric & categorical predictor
 
 ### Exercise 6
 
