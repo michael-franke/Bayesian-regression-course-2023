@@ -10,13 +10,14 @@ execute:
   message: false
 callout-appearance: simple
 ---
+
 {{< include 00-preamble.qmd >}}
 
 ```{r}
 dolphin <- aida::data_MT
 ```
 
-# Regression w multiple categorical predictors
+# Regression w/ multiple categorical predictors
 
 We want to regress `log RT` against the full combination of categorical factors `group`, `condition`, and `prototype_label`.
 
@@ -64,7 +65,10 @@ dolphin_prepped |>
   ggplot(aes(x = log(RT), fill = condition)) +
   geom_density(alpha = 0.4) +
   facet_grid(group ~ prototype_label)
+
 ```
+
+## Exercise 1
 
 ::: callout-caution
 **Exercise 1a**
@@ -178,12 +182,12 @@ faintr::compare_groups(
 )
 ```
 
-# Regression w/ metric & categorical predictor
+# Regression w/ metric & categorical predictors
 
-### Exercise 6
+## Exercise 2
 
 ::: callout-caution
-**Exercise 6a**
+**Exercise 2a**
 
 Create a new dataframe that contains only the mean values of the RT, and MAD for each animal (`exemplar`) and for correct and incorrect responses. Print out the `head` of the new dataframe.
 :::
@@ -205,7 +209,7 @@ head(dolphin_agg)
 ```
 
 ::: callout-caution
-**Exercise 6b**
+**Exercise 2b**
 
 Run a linear regression using brms. `MAD` is the dependent variable (i.e. the measure) and both `RT` and `correct` are independent variables (`MAD ~ RT + correct`). Tip: the coefficients might be really really small, so make sure the output is printed with enough numbers after the comma.
 :::
@@ -230,7 +234,7 @@ print(summary(model2), digits = 5)
 Try to understand the coefficient table. There is one coefficient for `RT` and one coefficient for `correct` which gives you the change in MAD from incorrect to correct responses.
 
 ::: callout-caution
-**Exercise 6c**
+**Exercise 2c**
 
 Plot a scatter plot of MAD \~ RT and color code it for correct responses (Tip: Make sure that `correct` is treated as a factor and not a numeric vector). Draw two predicted lines into the scatterplot. One for correct responses ("lightblue") and one for incorrect responses ("orange").
 :::
@@ -254,13 +258,12 @@ ggplot(data = dolphin_agg,
            color = correct)) + 
   geom_abline(intercept = model_intercept, slope = model_RT, color = "orange", size  = 2) +
   geom_abline(intercept = model_intercept + model_correct , slope = model_RT, color = "lightblue",size  = 2) +
-  geom_point(size = 3, alpha = 0.3) +
-  theme_aida()
-  
+  geom_point(size = 3, alpha = 0.3)
+
 ```
 
 ::: callout-caution
-**Exercise 6d**
+**Exercise 2d**
 
 Extract the posteriors for the coefficients of both `RT` and `correct` from the model output (use the `spread_draws()` function), calculate their means and a 67% Credible Interval. Print out the `head` of the aggregated dataframe.
 :::
@@ -290,7 +293,7 @@ posteriors2_agg
 ```
 
 ::: callout-caution
-**Exercise 6e**
+**Exercise 2e**
 
 Plot the scatterplot from 2c and plot 50 sample tuples for the regression lines for correct and incorrect responses.
 :::
@@ -321,13 +324,12 @@ ggplot(data = dolphin_agg,
   geom_abline(data = posteriors3,
               aes(intercept = b_Intercept + b_correct, slope = b_RT), 
               color = "lightblue", size  = 0.1) +
-  geom_point(size = 3, alpha = 0.3) +
-  theme_aida()
+  geom_point(size = 3, alpha = 0.3)
 
 ```
 
 ::: callout-caution
-**Exercise 6f**
+**Exercise 2f**
 
 Given our model and our data, calculate the evidential ratio of correct responses exhibiting larger MADs than incorrect responses.
 :::
@@ -341,7 +343,7 @@ hypothesis(model2, 'correct > 0')
 
 ```
 
-## Exercise 1:
+## Exercise 3
 
 Here is an aggregated data set `dolphin_agg` for you.
 
@@ -357,7 +359,7 @@ dolphin_agg <- dolphin %>%
 ```
 
 ::: callout-caution
-**Exercise 1a**
+**Exercise 3a**
 
 Standardize ("z-transform") `log_RT` such that the mean is at zero and 1 unit corresponds to the standard deviation. Name it `log_RT_s`.
 :::
@@ -372,9 +374,9 @@ dolphin_agg$log_RT_s <- scale(dolphin_agg$log_RT, scale = TRUE)
 ```
 
 ::: callout-caution
-**Exercise 1b**
+**Exercise 3b**
 
-Run a linear model with `brms` that predicts `MAD` based on `log_RT_s`, `group`, and their two-way interaction. Run 2000 iterations and 6 chains.
+Run a linear model with `brms` that predicts `MAD` based on `log_RT_s`, `group`, and their two-way interaction.
 :::
 
 ```{r}
@@ -384,15 +386,13 @@ Run a linear model with `brms` that predicts `MAD` based on `log_RT_s`, `group`,
 
 model1 = brm(
   MAD ~ log_RT_s * group, 
-  data = dolphin_agg,
-  iter = 2000,
-  chains = 6
+  data = dolphin_agg
   )
 
 ```
 
 ::: callout-caution
-**Exercise 1c**
+**Exercise 3c**
 
 Plot `MAD` (y) against `log_RT_s` (x) in a scatter plot and color-code for `group`. Plot the regression lines for the click and the touch group into the plot and don't forget to take possible interactions into account.
 :::
@@ -415,13 +415,15 @@ ggplot(data = dolphin_agg,
            color = group)) + 
   geom_point(size = 3, alpha = 0.3) +
   geom_vline(xintercept = 0, lty = "dashed") +
-  geom_abline(intercept = Intercept, slope = log_RT, color = "#E69F00", size = 2) +
-  geom_abline(intercept = Intercept + group, slope = log_RT + interaction, color = "#56B4E9", size = 2) 
+  geom_abline(intercept = Intercept, slope = log_RT, 
+              color = project_colors[1], size = 2) +
+  geom_abline(intercept = Intercept + group, slope = log_RT + interaction, 
+              color = project_colors[2], size = 2) 
 
 ```
 
 ::: callout-caution
-**Exercise 1d**
+**Exercise 3d**
 
 Specify very skeptic priors for all three coefficients. Use a normal distribution with mean = 0, and sd = 10. Rerun the model with those priors.
 :::
@@ -442,15 +444,13 @@ priors_model2 <- c(
 model2 = brm(
   MAD ~ log_RT_s * group, 
   data = dolphin_agg,
-  iter = 2000,
-  chains = 6,
   prior = priors_model2
   )
 
 ```
 
 ::: callout-caution
-**Exercise 1e**
+**Exercise 3e**
 
 Compare the model output of model1 to model2. What are the differences and what are the reasons for these differences?
 :::
@@ -477,11 +477,11 @@ ggplot(data = dolphin_agg,
            color = group)) + 
   geom_point(size = 3, alpha = 0.3) +
   geom_vline(xintercept = 0, lty = "dashed") +
-  geom_abline(intercept = Intercept, slope = log_RT, color = "#E69F00", size = 2) +
-  geom_abline(intercept = Intercept + group, slope = log_RT + interaction, color = "#56B4E9", size = 2) 
+  geom_abline(intercept = Intercept, slope = log_RT, 
+              color = project_colors[1], size = 2) +
+  geom_abline(intercept = Intercept + group, slope = log_RT + interaction, 
+              color = project_colors[1], size = 2) 
 
 # ANSWER: the magnitude of the coefficients is much smaller in model2, with the interaction term being close to zero. As a result, the lines in the plot are closer together and run in parallel. The reason for this change lies in the priors. We defined the priors of model2 rather narrowly, down weighing  data points larger or smaller than zero. This is a case of the prior dominating the posterior.
 
 ```
-
-
