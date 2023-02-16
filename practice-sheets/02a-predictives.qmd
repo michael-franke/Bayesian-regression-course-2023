@@ -41,7 +41,7 @@ model1 = brm(
 We can inspect the priors used in in a model fit like so:
 
 ```{r}
-brms::prior_summary(dolphin_agg)
+brms::prior_summary(model1)
 ```
 
 This tells us that the priors for the slope coefficient for the variable `MAD` was "flat".
