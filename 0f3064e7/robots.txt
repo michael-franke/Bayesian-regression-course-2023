@@ -1,0 +1,1 @@
+Sitemap: https://michael-franke.github.io/Bayesian-regression-course-2023/sitemap.xml
