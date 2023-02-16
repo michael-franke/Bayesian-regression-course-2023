@@ -1,8 +1,9 @@
 project:
   type: website
+  output-dir: docs
 
 website:
-  title: "BayesReg-2023"
+  title: "Bayesian Regression: Theory & Practice"
   sidebar:
     style: "docked"
     search: true
