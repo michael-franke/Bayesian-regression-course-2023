@@ -393,12 +393,12 @@ Formula: AUC ~ MAD
 
 Population-Level Effects: 
           Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-Intercept   508.37   1881.43 -3214.49  4202.67 1.00     2976     2616
-MAD         455.05     16.66   422.64   488.79 1.00     3717     2520
+Intercept   492.65   1815.84 -3082.90  4002.82 1.00     4462     2633
+MAD         455.31     16.28   423.69   487.30 1.00     4531     2967
 
 Family Specific Parameters: 
       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-sigma 17179.43   1180.57 15108.08 19664.94 1.00     3658     2765
+sigma 17158.97   1193.02 14921.23 19678.62 1.00     4279     2773
 
 Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -413,15 +413,15 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 <pre><code># A tibble: 5 × 10
   variable    mean  median      sd     mad      q5     q95  rhat ess_b…¹ ess_t…²
   &lt;chr&gt;      &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
-1 b_Inter…   508.    528.  1.88e+3 1.85e+3 -2625.   3614.   1.00   2976.   2616.
-2 b_MAD      455.    455.  1.67e+1 1.65e+1   428.    483.   1.00   3717.   2520.
-3 sigma    17179.  17120.  1.18e+3 1.18e+3 15387.  19278.   1.00   3658.   2765.
-4 lprior     -22.3   -22.3 2.97e-2 2.88e-2   -22.4   -22.3  1.00   3774.   3010.
-5 lp__     -1218.  -1218.  1.25e+0 9.81e-1 -1221.  -1217.   1.00   1969.   2830.
+1 b_Inter…   493.    484.  1.82e+3 1.86e+3 -2509.   3439.   1.00   4462.   2633.
+2 b_MAD      455.    455.  1.63e+1 1.66e+1   429.    482.   1.00   4531.   2967.
+3 sigma    17159.  17095.  1.19e+3 1.14e+3 15279.  19213.   1.00   4279.   2773.
+4 lprior     -22.3   -22.3 2.96e-2 2.89e-2   -22.4   -22.3  1.00   4330.   2426.
+5 lp__     -1218.  -1218.  1.24e+0 9.58e-1 -1221.  -1217.   1.00   1751.   1955.
 # … with abbreviated variable names ¹​ess_bulk, ²​ess_tail</code></pre>
 </div>
 </div>
-<p>The model output suggests that the posterior mean of the Intercept is around 508 . The coefficient for MAD is estimated to be about 455.</p>
+<p>The model output suggests that the posterior mean of the Intercept is around 493 . The coefficient for MAD is estimated to be about 455.</p>
 <p>To see how good a fit this is, we should manually draw this line into the graph from above.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># extract model parameters:</span></span>
@@ -477,16 +477,16 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 <pre><code># A tibble: 4,000 × 2
    b_MAD b_Intercept
    &lt;dbl&gt;       &lt;dbl&gt;
- 1  455.       2485.
- 2  472.      -1809.
- 3  437.       2355.
- 4  477.       -962.
- 5  431.       2487.
- 6  452.       1092.
- 7  475.       -580.
- 8  454.        769.
- 9  453.       2949.
-10  455.      -1622.
+ 1  466.      3086. 
+ 2  471.      -284. 
+ 3  446.      -485. 
+ 4  453.      2127. 
+ 5  471.        92.6
+ 6  448.      1563. 
+ 7  449.      -116. 
+ 8  468.     -2100. 
+ 9  448.      -338. 
+10  449.       369. 
 # … with 3,990 more rows</code></pre>
 </div>
 </div>
@@ -533,12 +533,12 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 # Groups:   parameter [1]
   parameter posterior
   &lt;chr&gt;         &lt;dbl&gt;
-1 b_MAD          455.
-2 b_MAD          472.
-3 b_MAD          437.
-4 b_MAD          477.
-5 b_MAD          431.
-6 b_MAD          452.</code></pre>
+1 b_MAD          466.
+2 b_MAD          471.
+3 b_MAD          446.
+4 b_MAD          453.
+5 b_MAD          471.
+6 b_MAD          448.</code></pre>
 </div>
 </div>
 <p>And then calculate the mean, the lower and the upper bound of a 90% CrI, using the function <code>tidybayes::hdi()</code>.</p>
@@ -556,7 +556,7 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 <pre><code># A tibble: 1 × 4
   parameter `90lowerCrI` mean_posterior `90higherCrI`
   &lt;chr&gt;            &lt;dbl&gt;          &lt;dbl&gt;         &lt;dbl&gt;
-1 b_MAD             422.           455.          488.</code></pre>
+1 b_MAD             425.           455.          488.</code></pre>
 </div>
 </div>
 <p>Now we use this newly created data frame to plot the posterior distributions of all population-level coefficients. Again, we use our new best friend, the <code>tidybayes</code> package which offers some sweet extensions to <code>ggplot</code>’s <code>geom_</code> family of functions. We also add a reference point to compare the posteriors against. A common and reasonable reference point is 0. Remember a slope coefficient of zero would correspond to a flat regression line.</p>
@@ -584,10 +584,10 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 <pre><code># A tibble: 1 × 1
   `90lowerCrI`
          &lt;dbl&gt;
-1         422.</code></pre>
+1         425.</code></pre>
 </div>
 </div>
-<p>Here you see density plots for our critical coefficients of the model. We care mostly about the slope coefficient (b_MAD) (the posterior of which is shown in red). Values between about 422.364656 and about 488.4670366 are plausible (at the 90% level) and they are indicated by the thick black line in the density plot for this coefficient. The mean of the distribution is indicated by the thick black dot.</p>
+<p>Here you see density plots for our critical coefficients of the model. We care mostly about the slope coefficient (b_MAD) (the posterior of which is shown in red). Values between about 424.7732627 and about 487.8232892 are plausible (at the 90% level) and they are indicated by the thick black line in the density plot for this coefficient. The mean of the distribution is indicated by the thick black dot.</p>
 <p>That’s helpful because we can relate this distribution to relevant values, for example the value 0 (dashed line). If you look at the coefficient, you can see that the posterior distribution does not include the value zero or any small-ish “Region of Practical Equivalence” around it. In fact, the posterior is really far away from zero. Thus, if we believe in the data and the model, we can be very certain that this coefficient is not zero. In other words, we would be very certain that there is a positive relationship between AUC and MAD (and in turn that ‘no relationship’ is not a very plausible scenario).</p>
 <p>The <code>brms</code> package allows us to quickly evaluate how many posterior samples fall into a certain value range. Just for fun, let’s calculate the amount of posterior samples that are larger than 450. The following code chunk does this for us:</p>
 <div class="cell">
@@ -595,7 +595,7 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>Hypothesis Tests for class b:
        Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio Post.Prob
-1 (MAD)-(450) &gt; 0     5.05     16.66   -21.75    32.53       1.64      0.62
+1 (MAD)-(450) &gt; 0     5.31     16.28   -20.79    31.67       1.65      0.62
   Star
 1     
 ---

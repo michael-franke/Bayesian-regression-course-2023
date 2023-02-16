@@ -152,7 +152,7 @@ dolphin_filter3
 
 ```
 
-## Grouping and summarizing 
+## Grouping and summarizing
 
 We can also generate summary statistics of certain variables with a combination of `group_by()` & `summarise()`. Let's get the means and standard deviations of the reactions times for each level in the variable `condition`. We also include the minimum and maximum values for each condition.
 
@@ -228,8 +228,7 @@ head(dolphin_agg_standardize)
 
 Now we can see that atypical categories exhibit relatively higher RTs, i.e., more than 0.3 standard deviations higher than for typical categories.
 
-
-## Exercises for data wrangling 
+## Exercises for data wrangling
 
 ### Exercise 1
 
@@ -237,10 +236,7 @@ Now we can see that atypical categories exhibit relatively higher RTs, i.e., mor
 **Exercise 1a**
 
 Take the dolphin data set and store a reduced variant of it as `dolphin_reduced`. The new data frame should contain only the following columns: `RT`, `AUC`, `group`, and `exemplar`.
-
 :::
-
-
 
 ```{r}
 #| eval: false
@@ -253,11 +249,11 @@ dolphin_reduced <- dolphin |>
 head(dolphin_reduced)
 
 ```
+
 ::: callout-caution
 **Exercise 1b**
 
 We are for now only interested in those data that have whales as the exemplar. `filter()` only those rows and store them in a new dataframe called `whales_only`.
-
 :::
 
 ```{r}
@@ -271,11 +267,11 @@ whales_only <- dolphin_reduced |>
 head(whales_only)
 
 ```
+
 ::: callout-caution
 **Exercise 1c**
 
 Now filter for only those data that have RTs below 1500ms.
-
 :::
 
 ```{r}
@@ -290,11 +286,11 @@ whales_only2 <- whales_only |>
 head(whales_only2)
 
 ```
+
 ::: callout-caution
 **Exercise 1d**
 
 We don't like that `AUC` is unstandardized. Use `mutate()` to create a new vector that represents scaled AUC values (scaling is achieved by the function `scale()`).
-
 :::
 
 ```{r}
@@ -313,7 +309,6 @@ head(whales_only_scaled)
 **Exercise 1e**
 
 Calculate the mean scaled AUC ratings for both both groups.
-
 :::
 
 ```{r}
@@ -333,7 +328,6 @@ head(whales_aggregate)
 **Exercise 1f**
 
 Do all of the above (a-e) in one pipeline.
-
 :::
 
 ```{r}
@@ -353,13 +347,12 @@ head(whales_aggregate)
 
 ```
 
-### Exercise 2 
+### Exercise 2
 
 ::: callout-caution
 **Exercise 1a**
 
 Take the dolphin data set and store a reduced variant of it. The new data frame should contain only the columns `condition`, `group`, and `xpos_flips`, `correct`. And within the `correct` vector, we are only interested in the correct trials (= 1). Filter accordingly.
-
 :::
 
 ```{r}
@@ -374,11 +367,11 @@ dolphin_sub <- dolphin |>
 head(dolphin_sub)
 
 ```
+
 ::: callout-caution
 **Exercise 2b**
 
 Create an aggregated data frame that contains the mean `xpos_flips` value and the standard deviation for `group` and `condition`.
-
 :::
 
 ```{r}
@@ -399,7 +392,6 @@ head(dolphin_agg)
 **Exercise 2c**
 
 Use the `rename()` function to rename the new vectors for the mean `xflips` and their standard deviation to `xflips_mean` and `xflips_sd`.
-
 :::
 
 ```{r}
@@ -417,7 +409,6 @@ dolphin_agg2 <- dolphin_agg |>
 **Exercise 2d**
 
 Do all of the above (a-c) in one pipeline.
-
 :::
 
 ```{r}
@@ -435,7 +426,6 @@ dolphin |>
          xflips_sd = sd_xpos_flips)
 
 ```
-
 
 # Basic plotting with `ggplot2`
 
@@ -478,7 +468,6 @@ ggplot(dolphin_agg, aes(x = condition, y = mean_RT)) +
 
 ```
 
-
 Ugh! What an ugly plot, right? But it's already telling a story: Atypical categories are responded to slower than typical categories. Let's add a measure of uncertainty, in our case the bootstrapped 95% confidence intervals, as error bars to the plot:
 
 ```{r}
@@ -496,7 +485,7 @@ ggplot(dolphin_agg, aes(x = condition, y = mean_RT)) +
     
 ```
 
-We can observe a couple of things here. First, ggplot automatically adjust the axes based on the elements to be plotted unless we tell it not to. Second, the error bars are plotted *in front* of the bars, i.e. closer to the viewer. This visual ordering reflects the order of layers. We first plotted the bars and THEN the error bars. 
+We can observe a couple of things here. First, ggplot automatically adjust the axes based on the elements to be plotted unless we tell it not to. Second, the error bars are plotted *in front* of the bars, i.e. closer to the viewer. This visual ordering reflects the order of layers. We first plotted the bars and THEN the error bars.
 
 Beyond bar plots, we can create other useful plots types. For example a point plot. Instead of a bar, we plot the mean RT as points.
 
@@ -510,7 +499,7 @@ ggplot(dolphin_agg, aes(x = condition, y = mean_RT)) +
   geom_point() +
   ggtitle("a point plot")
 
-```  
+```
 
 Or a line plot that connects the means with a line. For the line plot to work, we need to indicate a `group` aesthetic, i.e. the group that we want to connect with a line. If you have for example several interacting categories, you need to indicate which groups are supposed to be connected with lines (see below). Because we have only one group here, condition, we set `group` to `1`.
 
@@ -577,7 +566,7 @@ ggplot(dolphin_agg2, aes(x = condition, y = mean_RT, fill = group)) +
 ```
 
 Hm... that doesn't work out, the bars are on top of each other, we need to tell ggplot to position the bars next to each other instead. We do that with position_dogde(). Note that ggplot assigns a default color coding scheme to your plots if you don't specify it by hand.
-  
+
 ```{r bar4, fig.width = 6, fig.align="center"}
 
 ggplot(dolphin_agg2, aes(x = condition, y = mean_RT, fill = group)) +
@@ -586,7 +575,7 @@ ggplot(dolphin_agg2, aes(x = condition, y = mean_RT, fill = group)) +
 ```
 
 Awww much better! Alternatively, we can plot the two categories into separate panels. We achieve this by facetting using the `facet_grid()` function.
-  
+
 ```{r bar5, fig.width = 6, fig.align="center"}
 
 ggplot(dolphin_agg2, aes(x = group, y = mean_RT, fill = condition)) +
@@ -648,7 +637,7 @@ It looks like "shark" and "rattlesnake" behave very different from their buddies
 
 ## Exercises for plotting
 
-Take the scatter plot below as a departure point. It plots AUC (area-under-the-curve) against MAD (maximal absolute deviation). 
+Take the scatter plot below as a departure point. It plots AUC (area-under-the-curve) against MAD (maximal absolute deviation).
 
 ```{r}
 
@@ -666,9 +655,7 @@ ggplot(dolphin, aes(x = MAD, y = AUC)) +
 (2) Change the plot title to something informative.
 
 (3) Change the scaling of the x-axis to display only MAD values between -500 and 500
-
 :::
-
 
 ```{r}
 #| eval: false
@@ -693,10 +680,8 @@ ggplot(dolphin, aes(x = MAD, y = AUC,
 
 ```
 
-
 ::: callout-caution
 **Exercise 4**
-
 
 (1) Plot AUC values as a function of group in a density plot (`geom_density`).
 
@@ -705,7 +690,6 @@ ggplot(dolphin, aes(x = MAD, y = AUC,
 (3)) Add the aida_theme to the plot.
 
 (4) Add the mean values for both groups into the density plot as a line.
-
 :::
 
 ```{r}

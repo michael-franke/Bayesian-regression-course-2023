@@ -1,0 +1,352 @@
+---
+title: "Bayesian regression: theory & practice"
+subtitle: "03a: Generalized linear models"
+author: "Michael Franke"
+format: html
+editor: visual
+execute:
+  error: false
+  warning: false
+  message: false
+callout-appearance: simple
+---
+
+{{< include 00-preamble.qmd >}}
+
+```{r}
+dolphin <- aida::data_MT
+```
+
+This tutorial covers common types of generalized linear regression models:
+
+-   logistic regression
+-   multinomial regression
+-   ordinal regression
+-   Poisson regression
+
+# Logistic regression
+
+Our hypothesis is that typical examples are easier to classify, so they should have higher accuracy than atypical ones. We are also interested in additional effects of `group` on accuracy.
+
+As usual, we begin by plotting the relevant data.
+
+```{r}
+
+sum_stats <- dolphin |> 
+  group_by(group, condition) |> 
+  tidyboot::tidyboot_mean(correct) |> 
+  rename(accuracy = empirical_stat)
+  
+sum_stats
+
+sum_stats |> 
+  ggplot(aes(x = condition, y = accuracy, group = group, color = group)) +
+  geom_line(size = 1, position = position_dodge(0.2)) +
+  geom_point(size = 3, position = position_dodge(0.2)) +
+  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), 
+                width = 0.1, size = 0.35, position = position_dodge(0.2))
+
+```
+
+Visually, there might be a hint that typical trials had higher accuracy, but we cannot judge with the naked eye whether this is substantial.
+
+A logistic regression, regressing `correct` against `group * condition`, may tell us more. To run the logistic regression, we must tell the `brms:brm()` that we want to treat 0 and 1 as categories. To be sure, and also to directly dictate which of the two categories is the reference level, we use a factor (of strings) with explicit ordering.
+
+```{r}
+fit_logistic <- brm(
+  formula = correct ~ group * condition,
+  data = dolphin |> 
+    mutate(correct = factor(ifelse(correct, "correct", "incorrect"),
+                            levels = c("incorrect", "correct"))),
+  family = bernoulli()
+)
+
+summary(fit_logistic)
+```
+
+To test whether typical examples had credibly higher accuracy, the `faintr` package can be used like so:
+
+```{r}
+compare_groups(
+  fit_logistic,
+  higher = condition == "Typical",
+  lower  = condition == "Atypical"
+)
+```
+
+Based on these results, we may conclude that, given the model and the data, we should believe that typical examples had higher accuracy.
+
+::: callout-caution
+**Exercise 1a**
+
+Test whether there is reason to believe, given model and data, that the touch group was more accurate than the click group. (After all, the click group could change their minds until the very last moment.)
+:::
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+compare_groups(
+  fit_logistic,
+  higher = group == "click",
+  lower  = group == "touch"
+)
+
+# there is no reason to believe (given model and data) that this conjecture is true
+```
+
+::: callout-caution
+**Exercise 1b**
+
+If you look back at the plot of accuracy, it looks as if the change from atypical to typical condition had a reverse effect for the click and the touch group, i.e., it seems that ther is an interaction between these two variables (`group` and `condition`). Use the function `brms::hypothesis()` to examin the interaction term of the model fit. What do you conclude from this?
+:::
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+brms::hypothesis(fit_logistic, "grouptouch:conditionTypical < 0")
+
+# given model and data, it is very plausible to believe that there is an interaction between these two variables.
+```
+
+# Multinomial regression
+
+## Explanation
+
+In multinomial regression the predicted variable is categorical with more than two levels: $c_1, \dots, c_k$, $k > 2$. We want to predict probabilities for each category $p_1, \dots, p_k$ (with some linear predictors, more on this in a moment). To obtain the probabilities, we estimate a set of weights (so-called *logits*): $s_1, \dots, s_k$. By default, we set $s_1 = 0$. (We only need $k-1$ numbers to define a $k$-place probability vector (given that it must sum to one).) For all $1 \le i \le k$, we define the probability $p_i$ of category $i$ via the following (so-called *soft-max* operation):
+
+$$
+p_i = \frac{\exp s_i}{ \sum_{j=1}^k \exp s_j}
+$$
+
+This entails that for every $1 < i \le k$, the score $s_i$ can be interpreted as the log-odds of category $c_i$ over the reference category $c_1$:
+
+$$
+s_i = \log \frac{p_i}{p_1}
+$$
+
+Finally, we do not just estimate any-old vector of logits, but we assume that each logit $s_i$ ($1 < i \le k$) is estimated as a linear predictor (based on the usual linear regression predictor coefficients, appropriate to the type of the $l$ explanatory variables):
+
+$$
+s_i = \beta^i_0 + \beta^i_1 x_1 + \beta^i_2 x_2 + \dots + \beta^i_l x_l
+$$
+
+Two things are important for interpreting the outcome of a multinomial regression fit:
+
+1.  each category (beyond the reference category) receives its own (independent) set of regression coefficients;
+2.  the linear predictor predictor $s_i$ for category $c_i$ can be interpreted as the log-odds of the $i$-th category over the first, reference category.
+
+## Example
+
+Our next research question is slightly diffuse: we want to explore whether the distribution of trajectory types is affected by whether the correct target was on the right or the left. We only consider three types of categories (curved, straight and 'change of mind') and prepare the data to also give us the information whether the 'correct' target was left or right.
+
+```{r}
+dolphin_prepped <-
+  dolphin |>
+  mutate(
+    prototype_label = case_when(
+     prototype_label %in% c('curved', 'straight') ~ prototype_label,
+     TRUE ~ 'CoM'
+    ),
+    prototype_label = factor(prototype_label,
+                             levels = c('straight', 'curved', 'CoM')),
+    target_position = ifelse(category_left == category_correct, "left", "right")
+    )
+```
+
+The relevant data now looks as follows:
+
+```{r}
+dolphin_prepped |> 
+  select(prototype_label, target_position)
+```
+
+The counts and proportions we care about are these:
+
+```{r}
+sum_stats <- dolphin_prepped |> 
+  count(target_position, prototype_label) |>
+  group_by(target_position) |> 
+  mutate(proportion = n / sum(n))
+
+sum_stats
+```
+
+And here is a plot that might be useful to address your current issue:
+
+```{r}
+sum_stats |> 
+  ggplot(aes(x = prototype_label, y = proportion, fill = prototype_label)) +
+  geom_col() +
+  facet_grid(. ~ target_position)
+```
+
+It is hard to say from visual inspection alone, whether there are any noteworthy differences. We might consider the following:
+
+- **Conjecture:** the /difference/ in probability between straight vs curved is higher when the target is on the right than when it is on the left. 
+
+This is not a real "research hypothesis" but a conjecture about the data. Let's still run a multinomial regression model to test address this conjecture.
+
+```{r}
+fit_multinom <- brm(
+  formula = prototype_label ~ target_position,
+  data = dolphin_prepped,
+  family = categorical()
+)
+```
+
+The summary of this model fit is a bit unwieldy:
+
+```{r}
+summary(fit_multinom)
+```
+
+For better visibility here is a plot of the posteriors over relevant model parameters.
+
+```{r}
+# there MUST be a nicer way of doing this, but ...
+ordered_names <- c(
+  "b_mucurved_Intercept", 
+  "b_muCoM_Intercept",
+  "b_mucurved_target_positionright",
+  "b_muCoM_target_positionright"
+)
+
+fit_multinom |> 
+  tidybayes::tidy_draws() |> 
+  pivot_longer(cols = starts_with("b_")) |> 
+  select(name, value) |> 
+  mutate(name = factor(name, levels = rev(ordered_names))) |> 
+  ggplot(aes(x = value, y = name)) +
+  tidybayes::stat_halfeye() +
+  geom_vline(aes(xintercept = 0), color = project_colors[3], alpha= 1, size = 1)
+```
+
+::: callout-caution
+**Exercise 2a**
+
+Look at the names of the coefficients in the fit summary to find out:What is the reference level for the categorical predictor variable?
+
+:::
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+# It's the 'left' position, because there is a coefficient for the 'right' position.
+```
+
+::: callout-caution
+**Exercise 2b**
+
+Look at the names of the coefficients in the fit summary to find out: What is the reference level of the categories to be predicted in the multinomial model?
+
+:::
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+# The reference category is 'straight' because we have regression coeffiecient for all but the 'straight' category.
+```
+
+
+::: callout-caution
+**Exercise 2c**
+
+Can you extract information about our conjecture from this plot (or the summary of the model fit)?
+
+:::
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+# Yes! Our conjecture is about the difference in probability of the 'straight' vs he 'curved' category. This difference is directly encoded in regression coefficients. Concretely, the coefficient 'mucurved_Intercept' gives us the log odds of the 'straight' vs' the 'curved' category for the 'left'-position cases. The difference of log odds for the 'right'-position cases is simply the coefficient 'mucurved_target_positionright'. The is credibly smaller than zero (by a margin), so we may conclude that model and data provide support for our conjecture.
+
+```
+
+::: callout-caution
+**Exercise 2d**
+
+Use the postrior means of the regression coefficients to compute the corresponding scores $s_i$ and class probabilities $c_i$. Compare these to the observed frequencies.
+
+:::
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Show solution"
+
+# extract mean posteriors
+posterior_means <- fit_multinom |> tidybayes::summarise_draws() |> 
+  select(variable, mean) |> 
+  pivot_wider(names_from = variable, values_from = mean)
+
+as.numeric(posterior_means, names = colnames(posterior_means))  
+
+scores_left <- c(
+  0,
+  posterior_means[1,"b_mucurved_Intercept"] |> as.numeric(),
+  posterior_means[1,"b_muCoM_Intercept"] |> as.numeric()
+)
+
+scores_right <- c(
+  0,
+  posterior_means[1,"b_mucurved_Intercept"] |> as.numeric() + posterior_means[1,"b_mucurved_target_positionright"] |> as.numeric(),
+  posterior_means[1,"b_muCoM_Intercept"] |> as.numeric() + posterior_means[1,"b_muCoM_target_positionright"] |> as.numeric()
+)
+
+probabilities_left <- prop.table(exp(scores_left))
+probabilities_right <- prop.table(exp(scores_right))
+
+sum_stats |> ungroup() |> 
+  mutate(prediction = c(probabilities_left, probabilities_right))
+
+```
+
+# Ordinal regression
+
+```{r}
+dolphin_prepped2 <- dolphin_prepped |> 
+    mutate(prototype_label = factor(prototype_label, ordered = T))
+```
+
+```{r}
+dolphin_prepped2 |> 
+  ggplot(aes(x = MAD, y = prototype_label, color = prototype_label)) +
+  geom_jitter(alpha = 0.3,height = 0.3, width = 0)
+```
+
+
+```{r}
+fit_ordinal <- brm(
+  formula = prototype_label ~ MAD,
+  data = dolphin_prepped2,
+  family = cumulative()
+)
+```
+
+```{r}
+fit_ordinal |> 
+  tidybayes::gather_draws(b_MAD) |> 
+  ggplot(aes(x = .value, y = .variable)) +
+  tidybayes::stat_halfeye() +
+  ylab("") + xlab("") + ggplot2::xlim(0,0.03)
+```
+
+
+```{r}
+brms::hypothesis(fit_ordinal, "MAD > 0")
+```
+
+
+# Poisson regression
+
+see example in the next (exercise sheets)

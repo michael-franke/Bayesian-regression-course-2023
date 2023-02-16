@@ -536,4 +536,3 @@ ggplot(posteriors_all, aes(x = posterior, y = parameter, fill = model, color = m
 # Here, the priors, although encoding strong prior beliefs, have only little impact on the posteriors but do shift posteriors toward the priors.
 
 ```
-

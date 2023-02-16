@@ -2,6 +2,9 @@ project:
   type: website
   output-dir: docs
 
+execute:
+  freeze: auto
+
 website:
   title: "Bayesian Regression: Theory & Practice"
   sidebar:
@@ -28,7 +31,10 @@ website:
             text: Categorical predictors (tutorial)
           - href: practice-sheets/02c-catPreds-execises.qmd
             text: Categorical predictors (hands-on)
-
+      - section: "03: Generalized linear model"
+        contents:
+          - href: practice-sheets/03a-GLM-tutorial.qmd
+            text: GLM (tutorial)
 format:
   html:
     theme: cosmo

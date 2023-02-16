@@ -25,7 +25,7 @@ Most importantly, we should remember: any statistics of the data are just a tool
 
 First, we will shortly recap how linear regression models look like. Then, we will roughly familiarize ourselves with the data sets. Then, step by step we will look at different coding schemes: how they are applied in R and what a fitted regression model looks like.
 
-*Estimated time: 1.5h*
+*Estimated reading time: 1.5h*
 
 # Categorical Variables Coding Schemes
 
