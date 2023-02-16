@@ -18,7 +18,7 @@ Whatever approach to specifying priors we adopt, all (proper) priors generate pr
 So here we look at prior and posterior predictives of a Bayesian model.
 This is helpful because you might not have intuitions about how to select priors, but you will likely have intuitions about what counts are reasonable /a priori/ predictions.
 
-Here are [slides for session 2](02-priors-predictives-catPredictors.pdf).
+Here are [slides for session 2](slides/02-priors-predictives-catPredictors.pdf).
 
 # Part 2: Categorical predictors
 
