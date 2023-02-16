@@ -20,7 +20,7 @@ This is helpful because you might not have intuitions about how to select priors
 
 Here are [slides for session 2](02-priors-predictives-catPredictors.pdf).
 
-## Part 2: Categorical predictors
+# Part 2: Categorical predictors
 
 In the second part of this session, we look at categorical predictors in simple linear regression models.
 

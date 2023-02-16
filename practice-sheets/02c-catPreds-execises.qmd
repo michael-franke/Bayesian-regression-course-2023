@@ -1,6 +1,6 @@
 ---
 title: "Bayesian regression: theory & practice"
-subtitle: "02b: Simple linear regression & categorical predictors"
+subtitle: "02c: Categorical predictors (exercises)"
 author: "Michael Franke & Timo Roettger"
 format: html
 editor: visual
@@ -184,7 +184,7 @@ faintr::compare_groups(
 
 # Regression w/ metric & categorical predictors
 
-## Exercise 2
+# Exercise 2
 
 ::: callout-caution
 **Exercise 2a**
@@ -343,7 +343,7 @@ hypothesis(model2, 'correct > 0')
 
 ```
 
-## Exercise 3
+# Exercise 3
 
 Here is an aggregated data set `dolphin_agg` for you.
 

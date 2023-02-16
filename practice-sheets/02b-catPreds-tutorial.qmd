@@ -1,6 +1,6 @@
 ---
 title: "Bayesian regression: theory & practice"
-subtitle: "02b: Categorical predictors"
+subtitle: "02b: Categorical predictors (tutorial)"
 author: "Michael Franke & Polina Tsvilodub"
 format: html
 editor: visual

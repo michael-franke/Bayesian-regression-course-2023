@@ -262,7 +262,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title d-none d-lg-block">Bayesian regression: theory &amp; practice</h1>
-<p class="subtitle lead">02b: Categorical predictors</p>
+<p class="subtitle lead">02b: Categorical predictors (tutorial)</p>
 </div>
 
 
@@ -494,14 +494,14 @@ Formula: pitch ~ gender * context
 
 Population-Level Effects: 
                    Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-Intercept            260.65      7.61   245.50   275.60 1.00     1303     1387
-gender2             -116.08     10.69  -136.95   -95.03 1.00     1260     1324
-contextpol           -27.34     10.65   -48.12    -6.76 1.01     1107     1322
-gender2:contextpol    15.76     15.03   -14.81    45.65 1.00     1038     1235
+Intercept            260.48      8.06   244.23   276.63 1.00     1478     1606
+gender2             -115.80     11.34  -137.56   -93.18 1.00     1137     1440
+contextpol           -27.33     11.24   -49.62    -5.47 1.00     1353     1329
+gender2:contextpol    15.57     16.07   -18.16    45.86 1.00     1063     1123
 
 Family Specific Parameters: 
       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-sigma    36.20      3.01    30.95    42.67 1.00     2007     1384
+sigma    36.24      2.94    31.29    42.82 1.00     2171     1387
 
 Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -518,7 +518,7 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  lm.dummy.FE.coefs[<span class="dv">3</span>]<span class="sc">*</span><span class="dv">0</span> <span class="sc">+</span> lm.dummy.FE.coefs[<span class="dv">4</span>]<span class="sc">*</span>(<span class="dv">0</span>)</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>y1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 260.6502</code></pre>
+<pre><code>[1] 260.4776</code></pre>
 </div>
 </div>
 <p>Hence, the mean pitch of female speakers in informal context corresponds to the intercept. As a sanity check, we can recall that for dummy coded variables the model intercept is just the mean of the reference cell (in our case, female speakers in informal contexts!).</p>
@@ -528,7 +528,7 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  lm.dummy.FE.coefs[<span class="dv">3</span>]<span class="sc">*</span><span class="dv">0</span> <span class="sc">+</span> lm.dummy.FE.coefs[<span class="dv">4</span>]<span class="sc">*</span>(<span class="dv">1</span><span class="sc">*</span><span class="dv">0</span>)</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>y2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 144.574</code></pre>
+<pre><code>[1] 144.6731</code></pre>
 </div>
 </div>
 </section>
@@ -570,19 +570,19 @@ Formula: pitch ~ gender_contr * context_contr
 
 Population-Level Effects: 
                              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-Intercept                      192.86      4.02   184.78   200.80 1.00     2241
-gender_contr2                 -108.46      7.84  -123.92   -92.84 1.00     2717
-context_contr2                 -19.81      8.03   -35.46    -3.50 1.00     2644
-gender_contr2:context_contr2    15.81     15.42   -14.10    45.21 1.00     1991
+Intercept                      192.77      3.89   185.41   200.39 1.00     2037
+gender_contr2                 -108.29      7.87  -123.47   -92.69 1.00     2626
+context_contr2                 -19.41      7.80   -34.27    -4.36 1.00     2486
+gender_contr2:context_contr2    16.07     15.98   -15.93    47.92 1.00     2147
                              Tail_ESS
-Intercept                        1313
-gender_contr2                    1560
-context_contr2                   1572
-gender_contr2:context_contr2     1599
+Intercept                        1449
+gender_contr2                    1469
+context_contr2                   1694
+gender_contr2:context_contr2     1327
 
 Family Specific Parameters: 
       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-sigma    36.23      2.98    31.11    43.02 1.00     2479     1387
+sigma    36.16      2.93    31.10    42.18 1.00     2054     1451
 
 Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -594,7 +594,7 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>y1 <span class="ot">=</span> lm.contr.FE.coefs[<span class="dv">1</span>] <span class="sc">+</span> lm.contr.FE.coefs[<span class="dv">2</span>]<span class="sc">*</span>(<span class="sc">-</span><span class="fl">0.5</span>) <span class="sc">+</span> lm.contr.FE.coefs[<span class="dv">3</span>]<span class="sc">*</span>(<span class="sc">-</span><span class="fl">0.5</span>) <span class="sc">+</span> lm.contr.FE.coefs[<span class="dv">4</span>]<span class="sc">*</span>(<span class="sc">-</span><span class="fl">0.5</span>)<span class="sc">*</span>(<span class="sc">-</span><span class="fl">0.5</span>)</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>y1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 260.9499</code></pre>
+<pre><code>[1] 260.6378</code></pre>
 </div>
 </div>
 <p>We get the same result as before (as we should - the estimates should not depend on a coding scheme but only on the data). As a sanity check, we can again look at the intercept – it matches the grand mean we computed in the beginning of this tutorial – as it should.</p>
@@ -635,19 +635,19 @@ Formula: pitch ~ context_dev * gender_dev
 
 Population-Level Effects: 
                          Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-Intercept                  193.01      3.97   185.07   200.60 1.00     2369
-context_dev1                 9.84      4.01     2.12    17.51 1.00     2272
-gender_dev1                 54.12      4.17    45.89    62.22 1.00     2287
-context_dev1:gender_dev1     3.80      3.90    -3.60    11.33 1.00     2828
+Intercept                  192.91      3.98   184.98   200.89 1.00     2485
+context_dev1                 9.65      3.98     1.95    17.50 1.00     2528
+gender_dev1                 54.18      3.87    46.55    62.07 1.00     2586
+context_dev1:gender_dev1     3.86      3.81    -3.28    11.23 1.00     2944
                          Tail_ESS
-Intercept                    1449
-context_dev1                 1587
-gender_dev1                  1471
-context_dev1:gender_dev1     1533
+Intercept                    1135
+context_dev1                 1499
+gender_dev1                  1110
+context_dev1:gender_dev1     1335
 
 Family Specific Parameters: 
       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-sigma    36.16      2.98    31.03    42.74 1.00     2389     1443
+sigma    36.17      3.00    30.81    42.31 1.00     2256     1708
 
 Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -660,7 +660,7 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>y1 <span class="ot">=</span> lm.dev.FE.coefs[<span class="dv">1</span>] <span class="sc">+</span> lm.dev.FE.coefs[<span class="dv">2</span>]<span class="sc">*</span><span class="dv">1</span> <span class="sc">+</span> lm.dev.FE.coefs[<span class="dv">3</span>]<span class="sc">*</span><span class="dv">1</span> <span class="sc">+</span> lm.dev.FE.coefs[<span class="dv">4</span>]<span class="sc">*</span><span class="dv">1</span><span class="sc">*</span><span class="dv">1</span></span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>y1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 260.7746</code></pre>
+<pre><code>[1] 260.6081</code></pre>
 </div>
 </div>
 <p>Since the intercept is now the grand mean and not a specific reference level, let us think about the interpretation of the single estimates. The estimate of e.g.&nbsp;the context effect now denotes the value by which the mean pitch in informal (estimate * 1, remember our coding!) or polite contexts (estimate * -1) differs from the grand mean. So if we wish to calculate the mean pitch in polite contexts (across genders), we would do:</p>
@@ -668,7 +668,7 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>yPol <span class="ot">=</span> lm.dev.FE.coefs[<span class="dv">1</span>] <span class="sc">+</span> lm.dev.FE.coefs[<span class="dv">2</span>] <span class="sc">*</span> (<span class="sc">-</span><span class="dv">1</span>)</span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>yPol</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 183.1742</code></pre>
+<pre><code>[1] 183.2604</code></pre>
 </div>
 </div>
 <p>This means that the single estimates are in some sense ‘independent’ of each other (in contrast to e.g.&nbsp;dummy-coded variables where the estimates are bound to the reference levels of two variables) and give us insight if a specific factor is credibly different from 0. Similarly, if we wish to calculate the mean pitch of male speakers, we would calculate:</p>
@@ -676,7 +676,7 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>yM <span class="ot">=</span> lm.dev.FE.coefs[<span class="dv">1</span>] <span class="sc">+</span> lm.dev.FE.coefs[<span class="dv">3</span>] <span class="sc">*</span> (<span class="sc">-</span><span class="dv">1</span>)</span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>yM</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 138.89</code></pre>
+<pre><code>[1] 138.737</code></pre>
 </div>
 </div>
 </section>
@@ -713,19 +713,19 @@ Formula: pitch ~ context_helm * gender_helm
 
 Population-Level Effects: 
                            Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-Intercept                    192.82      4.07   184.94   200.75 1.00     2174
-context_helm1                 19.61      8.11     3.87    35.57 1.00     2796
-gender_helm1                 108.34      8.18    91.97   124.57 1.01     1884
-context_helm1:gender_helm1    15.97     16.13   -15.69    46.93 1.00     2498
+Intercept                    192.96      3.91   185.31   200.66 1.00     2126
+context_helm1                 19.47      7.95     3.42    35.09 1.00     2372
+gender_helm1                 108.21      7.74    93.25   123.29 1.00     2194
+context_helm1:gender_helm1    16.16     16.19   -15.20    47.72 1.00     2110
                            Tail_ESS
-Intercept                       888
-context_helm1                  1573
-gender_helm1                   1180
-context_helm1:gender_helm1     1586
+Intercept                      1486
+context_helm1                  1428
+gender_helm1                   1370
+context_helm1:gender_helm1     1409
 
 Family Specific Parameters: 
       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-sigma    36.18      2.96    31.10    42.62 1.00     2009     1354
+sigma    36.21      2.88    31.31    42.44 1.00     2051     1395
 
 Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -757,19 +757,19 @@ Formula: pitch ~ context * gender_contr
 
 Population-Level Effects: 
                          Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-Intercept                  202.63      5.57   191.72   214.02 1.00     2133
-contextpol                 -19.42      8.04   -34.75    -3.84 1.00     2025
-gender_contr2             -116.21     10.98  -138.44   -94.98 1.00     1803
-contextpol:gender_contr2    15.92     15.95   -16.77    47.25 1.00     1724
+Intercept                  202.54      5.57   191.88   213.03 1.01     2281
+contextpol                 -19.33      7.82   -34.49    -3.69 1.00     2637
+gender_contr2             -116.08     11.56  -138.69   -92.92 1.00     1643
+contextpol:gender_contr2    15.64     16.22   -16.34    47.25 1.00     1550
                          Tail_ESS
-Intercept                    1456
-contextpol                   1380
-gender_contr2                1410
-contextpol:gender_contr2     1290
+Intercept                    1408
+contextpol                   1555
+gender_contr2                1621
+contextpol:gender_contr2     1437
 
 Family Specific Parameters: 
       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-sigma    36.32      2.99    30.91    42.64 1.00     2068     1509
+sigma    36.25      2.85    31.20    42.44 1.00     2238     1467
 
 Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -875,19 +875,19 @@ Formula: RT ~ List * SOA
 
 Population-Level Effects: 
                  Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-Intercept          529.41     11.73   506.51   552.16 1.00      915     1162
-ListL2              14.02     16.74   -18.75    47.68 1.00      910     1250
-ListL3              -0.07     16.57   -32.54    33.01 1.00      989     1259
-SOAmedium            7.40     17.11   -25.90    42.15 1.00     1010      831
-SOAshort            14.88     16.61   -16.45    47.40 1.00      883     1004
-ListL2:SOAmedium     5.42     23.66   -40.75    50.42 1.00      949     1000
-ListL3:SOAmedium   -21.47     23.93   -69.29    23.76 1.00     1063     1010
-ListL2:SOAshort    -24.15     23.46   -69.93    21.44 1.00      875     1343
-ListL3:SOAshort    -22.34     23.53   -69.96    24.54 1.00      974     1237
+Intercept          529.62     11.53   506.42   551.72 1.00     1060     1252
+ListL2              13.38     16.40   -17.35    45.16 1.00      986     1101
+ListL3               0.05     16.70   -32.48    34.41 1.00     1019      974
+SOAmedium            8.07     16.38   -24.62    41.36 1.00      975     1039
+SOAshort            14.49     16.67   -19.49    46.98 1.00     1007     1140
+ListL2:SOAmedium     5.45     22.85   -39.21    49.02 1.00     1030     1207
+ListL3:SOAmedium   -22.56     23.48   -71.13    22.64 1.00     1072     1061
+ListL2:SOAshort    -23.37     23.48   -68.55    20.80 1.00      936     1288
+ListL3:SOAshort    -22.01     23.77   -67.51    21.76 1.00     1006     1144
 
 Family Specific Parameters: 
       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-sigma    46.57      2.84    41.58    52.89 1.00     1960     1352
+sigma    46.46      2.80    41.36    52.12 1.00     1877     1272
 
 Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -925,29 +925,29 @@ Formula: RT ~ List_contr * SOA_contr
 
 Population-Level Effects: 
                        Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-Intercept                534.58      3.85   527.12   542.06 1.00     2726
-List_contr2                8.10      9.67   -11.50    26.86 1.00     1719
-List_contr3              -14.54      9.41   -33.16     3.39 1.00     1840
-SOA_contr2                 2.15      9.53   -16.60    20.61 1.00     2202
-SOA_contr3                -0.54      9.50   -19.30    17.80 1.00     2035
-List_contr2:SOA_contr2     5.43     23.64   -42.98    50.88 1.00     1824
-List_contr3:SOA_contr2   -22.00     22.53   -67.04    22.11 1.00     1769
-List_contr2:SOA_contr3   -23.24     23.44   -67.79    22.87 1.00     1600
-List_contr3:SOA_contr3   -21.75     22.32   -65.26    22.21 1.00     1724
+Intercept                534.61      3.87   526.98   542.11 1.00     2523
+List_contr2                7.58      9.66   -11.77    26.23 1.00     2066
+List_contr3              -14.77      9.80   -35.28     3.91 1.00     2079
+SOA_contr2                 2.66      9.61   -15.92    21.30 1.00     2094
+SOA_contr3                -0.31      9.63   -19.72    18.79 1.00     2325
+List_contr2:SOA_contr2     6.42     23.95   -41.23    54.74 1.00     1578
+List_contr3:SOA_contr2   -21.29     23.86   -68.34    24.96 1.00     1597
+List_contr2:SOA_contr3   -22.19     23.17   -68.85    21.63 1.00     1675
+List_contr3:SOA_contr3   -21.46     23.00   -65.74    23.13 1.00     1559
                        Tail_ESS
-Intercept                  1418
-List_contr2                1398
-List_contr3                1632
-SOA_contr2                 1669
-SOA_contr3                 1692
-List_contr2:SOA_contr2     1590
-List_contr3:SOA_contr2     1708
-List_contr2:SOA_contr3     1310
-List_contr3:SOA_contr3     1533
+Intercept                  1655
+List_contr2                1543
+List_contr3                1560
+SOA_contr2                 1710
+SOA_contr3                 1744
+List_contr2:SOA_contr2     1591
+List_contr3:SOA_contr2     1374
+List_contr2:SOA_contr3     1533
+List_contr3:SOA_contr3     1645
 
 Family Specific Parameters: 
       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-sigma    46.61      2.81    41.25    52.42 1.00     2543     1393
+sigma    46.52      2.84    41.33    52.41 1.00     2048     1467
 
 Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -983,19 +983,19 @@ Formula: RT ~ List_dev * SOA_dev
 
 Population-Level Effects: 
                    Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-Intercept            534.66      3.71   527.41   542.17 1.00     3266     1547
-List_dev1              2.37      5.47    -8.13    12.53 1.00     1877     1507
-List_dev2             10.04      5.48    -1.07    20.78 1.00     1595     1373
-SOA_dev1              -0.60      5.55   -11.87    10.21 1.00     1904     1546
-SOA_dev2               1.62      5.45    -9.15    12.51 1.00     1832     1518
-List_dev1:SOA_dev1    -6.69      7.72   -22.45     8.03 1.00     1502     1649
-List_dev2:SOA_dev1    -1.04      7.73   -16.54    13.67 1.00     1363     1562
-List_dev1:SOA_dev2    -1.39      7.97   -16.82    14.26 1.00     1652     1619
-List_dev2:SOA_dev2    10.14      7.77    -5.34    24.99 1.00     1313     1593
+Intercept            534.64      3.78   526.95   542.22 1.00     2433     1685
+List_dev1              2.24      5.66    -8.59    13.43 1.00     2056     1575
+List_dev2             10.14      5.55    -0.94    21.12 1.00     2396     1598
+SOA_dev1              -0.28      5.42   -11.10     9.98 1.00     1820     1508
+SOA_dev2               1.20      5.51    -9.26    11.79 1.00     1843     1562
+List_dev1:SOA_dev1    -6.91      7.70   -21.50     7.96 1.00     1658     1594
+List_dev2:SOA_dev1    -0.91      7.70   -15.79    14.65 1.00     1596     1471
+List_dev1:SOA_dev2    -1.51      7.64   -16.71    13.44 1.00     1824     1495
+List_dev2:SOA_dev2    10.05      7.73    -4.98    24.95 1.00     1564     1402
 
 Family Specific Parameters: 
       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-sigma    46.53      2.87    41.37    52.65 1.00     2179     1290
+sigma    46.48      2.89    40.95    52.45 1.00     2326     1535
 
 Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -1032,29 +1032,29 @@ Formula: RT ~ List_helm * SOA_helm
 
 Population-Level Effects: 
                      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-Intercept              534.51      3.93   526.64   542.37 1.00     4074
-List_helm1               3.38      8.02   -12.30    19.44 1.00     4192
-List_helm2              22.16      9.49     3.94    40.73 1.00     4069
-SOA_helm1               -0.86      8.24   -17.22    15.08 1.01     3624
-SOA_helm2                2.86      9.65   -16.18    21.74 1.02     5085
-List_helm1:SOA_helm1   -15.50     18.43   -53.26    20.62 1.00     3987
-List_helm2:SOA_helm1   -12.56     20.56   -53.59    28.67 1.00     4623
-List_helm1:SOA_helm2   -14.74     20.24   -55.00    24.93 1.00     3843
-List_helm2:SOA_helm2    28.32     23.99   -20.64    74.02 1.00     4645
+Intercept              534.50      3.76   527.30   541.86 1.00     4082
+List_helm1               3.40      8.34   -12.91    19.29 1.00     3707
+List_helm2              22.35      9.14     4.83    40.61 1.00     3322
+SOA_helm1               -0.78      8.16   -16.54    14.73 1.00     4205
+SOA_helm2                2.60      9.73   -16.26    22.37 1.01     2898
+List_helm1:SOA_helm1   -15.22     16.79   -48.46    18.29 1.00     3803
+List_helm2:SOA_helm1   -13.32     20.30   -52.11    27.77 1.00     4224
+List_helm1:SOA_helm2   -14.08     19.81   -52.26    24.21 1.00     4486
+List_helm2:SOA_helm2    28.73     23.89   -17.59    74.49 1.00     3713
                      Tail_ESS
-Intercept                1396
-List_helm1               1579
-List_helm2               1308
-SOA_helm1                1297
-SOA_helm2                1278
-List_helm1:SOA_helm1     1410
-List_helm2:SOA_helm1     1195
-List_helm1:SOA_helm2     1717
-List_helm2:SOA_helm2     1293
+Intercept                1547
+List_helm1               1565
+List_helm2               1568
+SOA_helm1                1239
+SOA_helm2                1321
+List_helm1:SOA_helm1     1296
+List_helm2:SOA_helm1     1442
+List_helm1:SOA_helm2     1492
+List_helm2:SOA_helm2     1300
 
 Family Specific Parameters: 
       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-sigma    46.59      2.76    41.68    52.16 1.00     3385     1527
+sigma    46.50      2.85    41.29    52.70 1.00     3422     1646
 
 Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -1091,29 +1091,29 @@ Formula: RT ~ List_rhelm * SOA_rhelm
 
 Population-Level Effects: 
                        Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-Intercept                534.54      3.96   526.95   542.12 1.00     4210
-List_rhelm1                8.09      9.67   -10.90    28.55 1.00     3179
-List_rhelm2              -18.47      8.15   -34.67    -2.69 1.00     4683
-SOA_rhelm1                 1.98      9.50   -17.06    20.93 1.00     5128
-SOA_rhelm2                -1.64      8.25   -17.85    14.19 1.00     5260
-List_rhelm1:SOA_rhelm1     6.12     23.63   -39.96    52.64 1.00     5240
-List_rhelm2:SOA_rhelm1   -24.94     19.81   -63.50    13.55 1.00     3416
-List_rhelm1:SOA_rhelm2   -25.97     20.70   -67.95    16.11 1.00     3921
-List_rhelm2:SOA_rhelm2     2.11     16.47   -29.50    33.24 1.00     3927
+Intercept                534.56      3.99   527.00   542.33 1.01     4248
+List_rhelm1                7.51      9.14   -10.19    26.13 1.00     3844
+List_rhelm2              -18.63      8.32   -34.64    -2.77 1.00     4684
+SOA_rhelm1                 2.11      9.33   -16.62    20.10 1.00     3552
+SOA_rhelm2                -1.72      8.15   -17.98    14.40 1.00     4199
+List_rhelm1:SOA_rhelm1     5.25     23.26   -39.40    50.97 1.01     4700
+List_rhelm2:SOA_rhelm1   -24.23     20.49   -65.50    15.46 1.00     3761
+List_rhelm1:SOA_rhelm2   -25.84     19.58   -64.27    11.11 1.00     4355
+List_rhelm2:SOA_rhelm2     2.12     17.32   -31.44    36.35 1.00     3930
                        Tail_ESS
-Intercept                  1443
-List_rhelm1                1445
-List_rhelm2                1760
-SOA_rhelm1                 1541
-SOA_rhelm2                 1597
-List_rhelm1:SOA_rhelm1     1475
-List_rhelm2:SOA_rhelm1     1197
-List_rhelm1:SOA_rhelm2     1296
-List_rhelm2:SOA_rhelm2     1626
+Intercept                  1221
+List_rhelm1                1652
+List_rhelm2                1394
+SOA_rhelm1                 1443
+SOA_rhelm2                 1533
+List_rhelm1:SOA_rhelm1     1521
+List_rhelm2:SOA_rhelm1     1181
+List_rhelm1:SOA_rhelm2     1487
+List_rhelm2:SOA_rhelm2     1308
 
 Family Specific Parameters: 
       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-sigma    46.48      2.92    41.17    52.71 1.00     3242     1402
+sigma    46.54      2.88    41.30    52.85 1.00     3474     1451
 
 Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -1143,19 +1143,19 @@ Formula: RT ~ List * SOA_dev
 
 Population-Level Effects: 
                 Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-Intercept         536.77      6.87   523.24   550.06 1.00     1808     1523
-ListL2              7.87      9.78   -11.64    27.11 1.00     1780     1491
-ListL3            -14.62      9.83   -33.87     4.65 1.00     1758     1254
-SOA_dev1           -7.55      9.56   -26.60    11.05 1.00     1095     1412
-SOA_dev2            0.27     10.03   -19.12    19.94 1.00      991     1439
-ListL2:SOA_dev1     6.12     13.60   -20.68    32.20 1.00     1247     1495
-ListL3:SOA_dev1    14.67     13.61   -12.76    41.41 1.00     1270     1356
-ListL2:SOA_dev2    11.06     14.08   -17.87    38.54 1.00     1235     1321
-ListL3:SOA_dev2    -7.28     14.17   -33.62    20.86 1.00     1156     1495
+Intercept         536.90      6.62   523.28   549.62 1.01     1524     1109
+ListL2              7.55      9.33   -10.11    27.33 1.00     1713     1325
+ListL3            -14.64      9.49   -32.88     5.26 1.00     1820     1265
+SOA_dev1           -7.07      9.64   -26.10    11.36 1.00     1011     1402
+SOA_dev2           -0.16      9.43   -17.87    19.25 1.00      838     1319
+ListL2:SOA_dev1     5.62     13.22   -19.18    31.83 1.00     1184     1472
+ListL3:SOA_dev1    14.23     13.45   -12.17    40.25 1.00     1288     1615
+ListL2:SOA_dev2    11.85     13.45   -15.04    37.09 1.00     1033     1392
+ListL3:SOA_dev2    -6.91     13.46   -34.29    18.01 1.00     1054     1453
 
 Family Specific Parameters: 
       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-sigma    46.55      2.86    41.47    52.59 1.00     2001     1343
+sigma    46.43      2.83    41.24    52.21 1.00     1692     1240
 
 Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential

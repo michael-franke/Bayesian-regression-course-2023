@@ -440,13 +440,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>model2_priorOnly <span class="sc">|&gt;</span> tidybayes<span class="sc">::</span><span class="fu">summarise_draws</span>() <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 6
-  variable          mean    median       sd      mad       q5
-  &lt;chr&gt;            &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
-1 b_Intercept 13439.     13902.    54691.   37581.   -65674. 
-2 b_MAD          -0.0867    -0.213     9.88     9.78    -16.1
-3 sigma       37060.     25721.    40808.   24150.     2378. 
-4 lprior        -27.4      -26.9       1.73     1.37    -30.9
-5 lp__          -17.4      -17.0       1.59     1.27    -20.6</code></pre>
+  variable         mean    median       sd      mad       q5
+  &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+1 b_Intercept 13662.    14544.    48098.   35972.   -62741. 
+2 b_MAD           0.112     0.239     9.89    10.0     -15.9
+3 sigma       36775.    25417.    43389.   23878.     2238. 
+4 lprior        -27.3     -26.9       1.62     1.35    -30.4
+5 lp__          -17.4     -17.0       1.49     1.26    -20.3</code></pre>
 </div>
 </div>
 <p>It is also possible to obtain a posterior fit /and/ prior samples at the same time, but that is a bit more fickle, as the prior samples will have other names, and (AFAICS) other functions are required than for posterior samples, entailing other formatting of the returned samples.</p>
@@ -462,27 +462,27 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>model2_priorAdded <span class="sc">|&gt;</span> tidybayes<span class="sc">::</span><span class="fu">summarise_draws</span>() <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 8 × 6
-  variable             mean    median       sd       mad        q5
-  &lt;chr&gt;               &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
-1 b_Intercept     22130.    22169.     4545.    4518.     14632.  
-2 b_MAD              21.8      21.9      10.1     10.3        5.40
-3 sigma           47437.    47288.     3341.    3214.     42246.  
-4 prior_Intercept 13586.    13474.    51484.   39129.    -62472.  
-5 prior_b            -0.224    -0.133    10.1      9.93     -16.9 
-6 prior_sigma     36277.    24617.    40210.   23068.      2510.  
-7 lprior            -29.3     -28.8       2.29     2.09     -33.8 
-8 lp__            -1335.    -1334.        1.20     0.995  -1337.  </code></pre>
+  variable              mean    median       sd      mad        q5
+  &lt;chr&gt;                &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+1 b_Intercept     22264.     22254.     4610.    4402.    14677.  
+2 b_MAD              22.0       21.9      10.4     10.3       4.47
+3 sigma           47414.     47189.     3383.    3285.    42218.  
+4 prior_Intercept 14690.     14953.    52781.   37664.   -62374.  
+5 prior_b             0.0135     0.197    10.0      9.85    -16.6 
+6 prior_sigma     36470.     26113.    41684.   24341.     2145.  
+7 lprior            -29.4      -28.8       2.39     2.12    -34.1 
+8 lp__            -1335.     -1334.        1.24     1.08  -1337.  </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># prior samples</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>brms<span class="sc">::</span><span class="fu">prior_samples</span>(model2_priorAdded) <span class="sc">|&gt;</span> <span class="fu">summary</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>   Intercept             b                sigma         
- Min.   :-416330   Min.   :-41.5483   Min.   :     0.8  
- 1st Qu.: -12668   1st Qu.: -6.8293   1st Qu.: 12018.6  
- Median :  13474   Median : -0.1328   Median : 24617.4  
- Mean   :  13586   Mean   : -0.2236   Mean   : 36276.8  
- 3rd Qu.:  40079   3rd Qu.:  6.5712   3rd Qu.: 47486.4  
- Max.   : 449205   Max.   : 33.7766   Max.   :633664.9  </code></pre>
+<pre><code>   Intercept             b                 sigma         
+ Min.   :-413453   Min.   :-41.36579   Min.   :     8.3  
+ 1st Qu.:  -9659   1st Qu.: -6.62610   1st Qu.: 12038.9  
+ Median :  14953   Median :  0.19744   Median : 26112.7  
+ Mean   :  14690   Mean   :  0.01348   Mean   : 36469.7  
+ 3rd Qu.:  41135   3rd Qu.:  6.69899   3rd Qu.: 47133.2  
+ Max.   : 449774   Max.   : 39.59016   Max.   :809857.7  </code></pre>
 </div>
 </div>
 <p>A third possibility is to use <code>stats::update()</code> to draw additional prior samples from an already fitted object, like so:</p>
@@ -494,13 +494,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>model2_priorUpdate <span class="sc">|&gt;</span> tidybayes<span class="sc">::</span><span class="fu">summarise_draws</span>() <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 6
-  variable         mean     median       sd      mad       q5
-  &lt;chr&gt;           &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
-1 b_Intercept 14890.    14203.     49152.   37257.   -57837. 
-2 b_MAD          -0.132    -0.0676    10.2      9.90    -17.4
-3 sigma       36778.    25543.     41676.   23975.     2304. 
-4 lprior        -27.4     -26.9        1.65     1.36    -30.7
-5 lp__          -17.4     -17.0        1.51     1.30    -20.4</code></pre>
+  variable         mean    median       sd      mad       q5
+  &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+1 b_Intercept 14847.    14753.    48797.   37363.   -59716. 
+2 b_MAD           0.289     0.421    10.1     10.0     -16.2
+3 sigma       36178.    24646.    39741.   22892.     2317. 
+4 lprior        -27.3     -27.0       1.62     1.34    -30.5
+5 lp__          -17.4     -17.0       1.52     1.27    -20.3</code></pre>
 </div>
 </div>
 </section>
