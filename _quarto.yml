@@ -10,6 +10,7 @@ website:
   sidebar:
     style: "docked"
     search: true
+    collapse-level: 1
     contents:
       - href: index.qmd
         text: Overview
@@ -35,6 +36,8 @@ website:
         contents:
           - href: practice-sheets/03a-GLM-tutorial.qmd
             text: GLM (tutorial)
+          - href: practice-sheets/03b-GLM-exercises.qmd
+            text: GLM (exercises)
 format:
   html:
     theme: cosmo
