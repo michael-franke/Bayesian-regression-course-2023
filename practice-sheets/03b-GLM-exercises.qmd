@@ -207,7 +207,7 @@ ggplot(data = predicted_values) +
 ```
 
 
-# Exercise 2: Poisson reduction
+# Exercise 2: Poisson regression
 
 We will continue to use `dolphin_agg` in this exercise.
 
