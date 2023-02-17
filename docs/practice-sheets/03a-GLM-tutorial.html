@@ -467,10 +467,10 @@ y &amp; \sim \text{Bernoulli}(\eta) &amp;&amp; \color{gray}{\text{[likelihood]}}
 # Groups:   group [2]
   group condition     n accuracy ci_lower  mean ci_upper
   &lt;chr&gt; &lt;chr&gt;     &lt;int&gt;    &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
-1 click Atypical    318    0.874    0.838 0.875    0.910
-2 click Typical     689    0.964    0.949 0.964    0.977
-3 touch Atypical    330    0.909    0.878 0.910    0.939
-4 touch Typical     715    0.941    0.924 0.941    0.957</code></pre>
+1 click Atypical    318    0.874    0.836 0.874    0.908
+2 click Typical     689    0.964    0.950 0.964    0.977
+3 touch Atypical    330    0.909    0.875 0.909    0.938
+4 touch Typical     715    0.941    0.923 0.941    0.958</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>sum_stats <span class="sc">|&gt;</span> </span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> condition, <span class="at">y =</span> accuracy, <span class="at">group =</span> group, <span class="at">color =</span> group)) <span class="sc">+</span></span>
@@ -504,15 +504,15 @@ Formula: correct ~ group * condition
 
 Population-Level Effects: 
                             Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-Intercept                       1.95      0.17     1.62     2.30 1.00     2394
-grouptouch                      0.37      0.26    -0.12     0.88 1.00     1842
-conditionTypical                1.36      0.27     0.84     1.90 1.00     1619
-grouptouch:conditionTypical    -0.89      0.36    -1.61    -0.18 1.00     1490
+Intercept                       1.95      0.17     1.63     2.27 1.00     2112
+grouptouch                      0.37      0.26    -0.13     0.88 1.00     1739
+conditionTypical                1.35      0.26     0.84     1.86 1.00     1795
+grouptouch:conditionTypical    -0.89      0.36    -1.60    -0.21 1.00     1627
                             Tail_ESS
-Intercept                       2682
-grouptouch                      2111
-conditionTypical                1600
-grouptouch:conditionTypical     1733
+Intercept                       2511
+grouptouch                      1942
+conditionTypical                2654
+grouptouch:conditionTypical     2163
 
 Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -530,8 +530,8 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 <pre><code>Outcome of comparing groups: 
  * higher:  condition == "Typical" 
  * lower:   condition == "Atypical" 
-Mean 'higher - lower':  0.9107 
-95% HDI:  [ 0.569 ; 1.288 ]
+Mean 'higher - lower':  0.9071 
+95% HDI:  [ 0.5509 ; 1.269 ]
 P('higher - lower' &gt; 0):  1 
 Posterior odds:  Inf </code></pre>
 </div>
@@ -696,15 +696,15 @@ Formula: prototype_label ~ target_position
 
 Population-Level Effects: 
                               Estimate Est.Error l-95% CI u-95% CI Rhat
-mucurved_Intercept               -1.71      0.09    -1.90    -1.53 1.00
+mucurved_Intercept               -1.71      0.09    -1.89    -1.53 1.00
 muCoM_Intercept                  -1.71      0.09    -1.90    -1.53 1.00
-mucurved_target_positionright    -0.43      0.15    -0.73    -0.16 1.00
-muCoM_target_positionright       -0.00      0.13    -0.26     0.25 1.00
+mucurved_target_positionright    -0.44      0.14    -0.71    -0.16 1.00
+muCoM_target_positionright        0.00      0.13    -0.26     0.26 1.00
                               Bulk_ESS Tail_ESS
-mucurved_Intercept                4831     3181
-muCoM_Intercept                   4079     2865
-mucurved_target_positionright     3635     3093
-muCoM_target_positionright        4048     3294
+mucurved_Intercept                4474     3569
+muCoM_Intercept                   4190     3083
+mucurved_target_positionright     3918     3193
+muCoM_target_positionright        4403     3067
 
 Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -863,12 +863,12 @@ y &amp; \sim \text{Categorical}(\eta) &amp;&amp; \color{gray}{\text{[likelihood]
 <p><img src="03a-GLM-tutorial_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>To run an ordinal regression model, we specify <code>family = cumulative(link="probit")</code>. The parameter <code>link="probit"</code> specifies the link function to be of the normal family (the link function is a cumulative normal distribution, the inverse of which is called “probit” function).</p>
+<p>To run an ordinal regression model, we specify <code>family = cumulative()</code>. This runs the default cumulative-logit model introduced at the beginning of the session.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>fit_ordinal <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> prototype_label <span class="sc">~</span> MAD,</span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> dolphin_prepped2,</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">cumulative</span>(<span class="at">link=</span> <span class="st">"probit"</span>)</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">cumulative</span>()</span>
 <span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The summary output for this fitted model gives information about the slope of the predictor variable <code>MAD</code> as usual. But it also supplies information about two (!) intercepts: these are the cutoff points for the different categories in the cumulative normal link function.</p>
@@ -876,7 +876,7 @@ y &amp; \sim \text{Categorical}(\eta) &amp;&amp; \color{gray}{\text{[likelihood]
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit_ordinal)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> Family: cumulative 
-  Links: mu = probit; disc = identity 
+  Links: mu = logit; disc = identity 
 Formula: prototype_label ~ MAD 
    Data: dolphin_prepped2 (Number of observations: 2052) 
   Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
@@ -884,9 +884,9 @@ Formula: prototype_label ~ MAD
 
 Population-Level Effects: 
              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-Intercept[1]     2.18      0.08     2.02     2.33 1.00     2117     2370
-Intercept[2]     4.91      0.24     4.47     5.38 1.00     1507     1620
-MAD              0.01      0.00     0.01     0.01 1.00     2112     2486
+Intercept[1]     4.04      0.17     3.71     4.40 1.00     2390     2492
+Intercept[2]     9.49      0.51     8.54    10.52 1.00     1453     1511
+MAD              0.02      0.00     0.02     0.03 1.00     1802     2191
 
 Family Specific Parameters: 
      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
@@ -919,7 +919,7 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>Hypothesis Tests for class b:
   Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio Post.Prob Star
-1  (MAD) &gt; 0     0.01         0     0.01     0.01        Inf         1    *
+1  (MAD) &gt; 0     0.02         0     0.02     0.03        Inf         1    *
 ---
 'CI': 90%-CI for one-sided and 95%-CI for two-sided hypotheses.
 '*': For one-sided hypotheses, the posterior probability exceeds 95%;

@@ -420,13 +420,13 @@ dolphin_prepped2 |>
   geom_jitter(alpha = 0.3,height = 0.3, width = 0)
 ```
 
-To run an ordinal regression model, we specify `family = cumulative(link="probit")`. The parameter `link="probit"` specifies the link function to be of the normal family (the link function is a cumulative normal distribution, the inverse of which is called "probit" function).
+To run an ordinal regression model, we specify `family = cumulative()`. This runs the default cumulative-logit model introduced at the beginning of the session. 
 
 ```{r}
 fit_ordinal <- brm(
   formula = prototype_label ~ MAD,
   data = dolphin_prepped2,
-  family = cumulative(link= "probit")
+  family = cumulative()
 )
 ```
 
