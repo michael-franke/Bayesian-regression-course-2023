@@ -241,14 +241,25 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#logistic-regression" id="toc-logistic-regression" class="nav-link active" data-scroll-target="#logistic-regression">Logistic regression</a></li>
-  <li><a href="#multinomial-regression" id="toc-multinomial-regression" class="nav-link" data-scroll-target="#multinomial-regression">Multinomial regression</a>
+  <li><a href="#logistic-regression" id="toc-logistic-regression" class="nav-link active" data-scroll-target="#logistic-regression">Logistic regression</a>
   <ul class="collapse">
   <li><a href="#explanation" id="toc-explanation" class="nav-link" data-scroll-target="#explanation">Explanation</a></li>
   <li><a href="#example" id="toc-example" class="nav-link" data-scroll-target="#example">Example</a></li>
   </ul></li>
-  <li><a href="#ordinal-regression" id="toc-ordinal-regression" class="nav-link" data-scroll-target="#ordinal-regression">Ordinal regression</a></li>
-  <li><a href="#poisson-regression" id="toc-poisson-regression" class="nav-link" data-scroll-target="#poisson-regression">Poisson regression</a></li>
+  <li><a href="#multinomial-regression" id="toc-multinomial-regression" class="nav-link" data-scroll-target="#multinomial-regression">Multinomial regression</a>
+  <ul class="collapse">
+  <li><a href="#explanation-1" id="toc-explanation-1" class="nav-link" data-scroll-target="#explanation-1">Explanation</a></li>
+  <li><a href="#example-1" id="toc-example-1" class="nav-link" data-scroll-target="#example-1">Example</a></li>
+  </ul></li>
+  <li><a href="#ordinal-regression" id="toc-ordinal-regression" class="nav-link" data-scroll-target="#ordinal-regression">Ordinal regression</a>
+  <ul class="collapse">
+  <li><a href="#example-2" id="toc-example-2" class="nav-link" data-scroll-target="#example-2">Example</a></li>
+  </ul></li>
+  <li><a href="#poisson-regression" id="toc-poisson-regression" class="nav-link" data-scroll-target="#poisson-regression">Poisson regression</a>
+  <ul class="collapse">
+  <li><a href="#explanation-2" id="toc-explanation-2" class="nav-link" data-scroll-target="#explanation-2">Explanation</a></li>
+  <li><a href="#example-3" id="toc-example-3" class="nav-link" data-scroll-target="#example-3">Example</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -343,6 +354,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 <section id="logistic-regression" class="level1">
 <h1>Logistic regression</h1>
+<section id="explanation" class="level2">
+<h2 class="anchored" data-anchor-id="explanation">Explanation</h2>
+<p>The <a href="https://michael-franke.github.io/intro-data-analysis/selected-discrete-distributions-of-random-variables.html#app-91-distributions-bernoullihael-franke.github.io/intro-data-analysis/selected-discrete-distributions-of-random-variables.html#poisson-distribution">Bernoulli distribution</a> gives the probability of a single binary outcome when the bias for the reference outcome is <span class="math inline">\(p\)</span>. The link function is the logistic function (so the inverse link function is the logit function). The logistic regression model is defined as:</p>
+<p><span class="math display">\[
+\begin{align*}
+\xi  &amp;= X \beta       &amp;&amp; \color{gray}{\text{[linear predictor]}} \\
+\eta_i &amp;= \text{logistic}(\xi_i) &amp;&amp; \color{gray}{\text{[predictor of central tendency]}} \\
+y_i &amp; \sim \text{Bernoulli}(\eta_i) &amp;&amp; \color{gray}{\text{[likelihood]}}
+\end{align*}
+\]</span></p>
+</section>
+<section id="example" class="level2">
+<h2 class="anchored" data-anchor-id="example">Example</h2>
 <p>Our hypothesis is that typical examples are easier to classify, so they should have higher accuracy than atypical ones. We are also interested in additional effects of <code>group</code> on accuracy.</p>
 <p>As usual, we begin by plotting the relevant data.</p>
 <div class="cell">
@@ -357,9 +381,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 # Groups:   group [2]
   group condition     n accuracy ci_lower  mean ci_upper
   &lt;chr&gt; &lt;chr&gt;     &lt;int&gt;    &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
-1 click Atypical    318    0.874    0.836 0.874    0.908
-2 click Typical     689    0.964    0.950 0.964    0.977
-3 touch Atypical    330    0.909    0.875 0.908    0.938
+1 click Atypical    318    0.874    0.839 0.874    0.913
+2 click Typical     689    0.964    0.948 0.964    0.977
+3 touch Atypical    330    0.909    0.877 0.909    0.939
 4 touch Typical     715    0.941    0.924 0.941    0.958</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sum_stats <span class="sc">|&gt;</span> </span>
@@ -394,15 +418,15 @@ Formula: correct ~ group * condition
 
 Population-Level Effects: 
                             Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-Intercept                       1.95      0.17     1.63     2.29 1.00     2176
-grouptouch                      0.37      0.26    -0.13     0.90 1.00     1730
-conditionTypical                1.35      0.26     0.83     1.86 1.00     1627
-grouptouch:conditionTypical    -0.88      0.35    -1.56    -0.18 1.00     1402
+Intercept                       1.95      0.17     1.63     2.30 1.00     2540
+grouptouch                      0.37      0.26    -0.13     0.87 1.00     1764
+conditionTypical                1.34      0.26     0.84     1.86 1.00     1768
+grouptouch:conditionTypical    -0.88      0.36    -1.57    -0.17 1.00     1507
                             Tail_ESS
-Intercept                       2557
-grouptouch                      2250
-conditionTypical                1595
-grouptouch:conditionTypical     2079
+Intercept                       3353
+grouptouch                      2378
+conditionTypical                2687
+grouptouch:conditionTypical     1965
 
 Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -420,8 +444,8 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 <pre><code>Outcome of comparing groups: 
  * higher:  condition == "Typical" 
  * lower:   condition == "Atypical" 
-Mean 'higher - lower':  0.9063 
-95% HDI:  [ 0.5439 ; 1.27 ]
+Mean 'higher - lower':  0.9018 
+95% HDI:  [ 0.5419 ; 1.246 ]
 P('higher - lower' &gt; 0):  1 
 Posterior odds:  Inf </code></pre>
 </div>
@@ -470,10 +494,11 @@ Posterior odds:  Inf </code></pre>
 </details>
 </div>
 </section>
+</section>
 <section id="multinomial-regression" class="level1">
 <h1>Multinomial regression</h1>
-<section id="explanation" class="level2">
-<h2 class="anchored" data-anchor-id="explanation">Explanation</h2>
+<section id="explanation-1" class="level2">
+<h2 class="anchored" data-anchor-id="explanation-1">Explanation</h2>
 <p>In multinomial regression the predicted variable is categorical with more than two levels: <span class="math inline">\(c_1, \dots, c_k\)</span>, <span class="math inline">\(k &gt; 2\)</span>. We want to predict probabilities for each category <span class="math inline">\(p_1, \dots, p_k\)</span> (with some linear predictors, more on this in a moment). To obtain the probabilities, we estimate a set of weights (so-called <em>logits</em>): <span class="math inline">\(s_1, \dots, s_k\)</span>. By default, we set <span class="math inline">\(s_1 = 0\)</span>. (We only need <span class="math inline">\(k-1\)</span> numbers to define a <span class="math inline">\(k\)</span>-place probability vector (given that it must sum to one).) For all <span class="math inline">\(1 \le i \le k\)</span>, we define the probability <span class="math inline">\(p_i\)</span> of category <span class="math inline">\(i\)</span> via the following (so-called <em>soft-max</em> operation):</p>
 <p><span class="math display">\[
 p_i = \frac{\exp s_i}{ \sum_{j=1}^k \exp s_j}
@@ -492,8 +517,8 @@ s_i = \beta^i_0 + \beta^i_1 x_1 + \beta^i_2 x_2 + \dots + \beta^i_l x_l
 <li>the linear predictor predictor <span class="math inline">\(s_i\)</span> for category <span class="math inline">\(c_i\)</span> can be interpreted as the log-odds of the <span class="math inline">\(i\)</span>-th category over the first, reference category.</li>
 </ol>
 </section>
-<section id="example" class="level2">
-<h2 class="anchored" data-anchor-id="example">Example</h2>
+<section id="example-1" class="level2">
+<h2 class="anchored" data-anchor-id="example-1">Example</h2>
 <p>Our next research question is slightly diffuse: we want to explore whether the distribution of trajectory types is affected by whether the correct target was on the right or the left. We only consider three types of categories (curved, straight and ‘change of mind’) and prepare the data to also give us the information whether the ‘correct’ target was left or right.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>dolphin_prepped <span class="ot">&lt;-</span></span>
@@ -585,15 +610,15 @@ Formula: prototype_label ~ target_position
 
 Population-Level Effects: 
                               Estimate Est.Error l-95% CI u-95% CI Rhat
-mucurved_Intercept               -1.71      0.09    -1.90    -1.53 1.00
-muCoM_Intercept                  -1.71      0.09    -1.89    -1.54 1.00
-mucurved_target_positionright    -0.43      0.15    -0.73    -0.15 1.00
+mucurved_Intercept               -1.71      0.09    -1.89    -1.54 1.00
+muCoM_Intercept                  -1.71      0.09    -1.90    -1.54 1.00
+mucurved_target_positionright    -0.44      0.14    -0.72    -0.16 1.00
 muCoM_target_positionright       -0.00      0.13    -0.25     0.25 1.00
                               Bulk_ESS Tail_ESS
-mucurved_Intercept                4655     3332
-muCoM_Intercept                   3649     3016
-mucurved_target_positionright     3844     3151
-muCoM_target_positionright        3772     2960
+mucurved_Intercept                5152     3290
+muCoM_Intercept                   3585     2692
+mucurved_target_positionright     4283     3375
+muCoM_target_positionright        4022     3014
 
 Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -717,41 +742,87 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 </section>
 <section id="ordinal-regression" class="level1">
 <h1>Ordinal regression</h1>
+<section id="example-2" class="level2">
+<h2 class="anchored" data-anchor-id="example-2">Example</h2>
+<p>The kind of mouse-trajectories, as categorized in variable <code>prototype_label</code>, are plausibly ordered by the “amount of deviation”. The following therefore tries to predict the ordered category <code>prototype_label</code> from the numerical measure <code>MAD</code>. Here is a plot of how this would look like:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>dolphin_prepped2 <span class="ot">&lt;-</span> dolphin_prepped <span class="sc">|&gt;</span> </span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">prototype_label =</span> <span class="fu">factor</span>(prototype_label, <span class="at">ordered =</span> T))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>dolphin_prepped2 <span class="sc">|&gt;</span> </span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> MAD, <span class="at">y =</span> prototype_label, <span class="at">color =</span> prototype_label)) <span class="sc">+</span></span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(<span class="at">alpha =</span> <span class="fl">0.3</span>,<span class="at">height =</span> <span class="fl">0.3</span>, <span class="at">width =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># prepare data by making 'prototype_label' an ordered factor</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>dolphin_prepped2 <span class="ot">&lt;-</span> dolphin_prepped <span class="sc">|&gt;</span> </span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">prototype_label =</span> <span class="fu">factor</span>(prototype_label, <span class="at">ordered =</span> T))</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="co"># plotting the ordered categories as a function of MAD</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>dolphin_prepped2 <span class="sc">|&gt;</span> </span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> MAD, <span class="at">y =</span> prototype_label, </span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> prototype_label)) <span class="sc">+</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(<span class="at">alpha =</span> <span class="fl">0.3</span>,<span class="at">height =</span> <span class="fl">0.3</span>, <span class="at">width =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="03a-GLM-tutorial_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="672"></p>
+<p><img src="03a-GLM-tutorial_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<p>To run an ordinal regression model, we specify <code>family = cumulative(link="probit")</code>. The parameter <code>link="probit"</code> specifies the link function to be of the normal family (the link function is a cumulative normal distribution, the inverse of which is called “probit” function).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>fit_ordinal <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> prototype_label <span class="sc">~</span> MAD,</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> dolphin_prepped2,</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">cumulative</span>()</span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>fit_ordinal <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> prototype_label <span class="sc">~</span> MAD,</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> dolphin_prepped2,</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">cumulative</span>(<span class="at">link=</span> <span class="st">"probit"</span>)</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[[1]]
+Stan model 'b41c4cb943951498cb725e0d6b8803e3' does not contain samples.
+
+[[2]]
+Stan model 'b41c4cb943951498cb725e0d6b8803e3' does not contain samples.</code></pre>
 </div>
+</div>
+<p>The summary output for this fitted model gives information about the slope of the predictor variable <code>MAD</code> as usual. But it also supplies information about two (!) intercepts: these are the cutoff points for the different categories in the cumulative normal link function.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>fit_ordinal <span class="sc">|&gt;</span> </span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  tidybayes<span class="sc">::</span><span class="fu">gather_draws</span>(b_MAD) <span class="sc">|&gt;</span> </span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> .value, <span class="at">y =</span> .variable)) <span class="sc">+</span></span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  tidybayes<span class="sc">::</span><span class="fu">stat_halfeye</span>() <span class="sc">+</span></span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">""</span>) <span class="sc">+</span> <span class="fu">xlab</span>(<span class="st">""</span>) <span class="sc">+</span> ggplot2<span class="sc">::</span><span class="fu">xlim</span>(<span class="dv">0</span>,<span class="fl">0.03</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit_ordinal)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> Family: cumulative 
+  Links: mu = probit; disc = identity 
+Formula: prototype_label ~ MAD 
+   Data: dolphin_prepped2 (Number of observations: 2052) 
+  Draws: 2 chains, each with iter = 2000; warmup = 1000; thin = 1;
+         total post-warmup draws = 2000
+
+Population-Level Effects: 
+             Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+Intercept[1]     2.17      0.08     2.02     2.34 1.00      978      987
+Intercept[2]     4.91      0.24     4.45     5.38 1.01      621      732
+MAD              0.01      0.00     0.01     0.01 1.01      743     1079
+
+Family Specific Parameters: 
+     Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+disc     1.00      0.00     1.00     1.00   NA       NA       NA
+
+Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+and Tail_ESS are effective sample size measures, and Rhat is the potential
+scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
+</div>
+</div>
+<p>Concretely, this means that if <code>MAD</code> is $x$, we compute the linear predictor <span class="math inline">\(\xi = \beta_{\text{MAD}} x\)</span> (without intercept!), and then “imagine around it” a standard normal distribution, i.e., consider the normal distribution $\mathcal{\xi, 1}$. The probabilities of the three categories are given by the areas under the curve of this normal distribution, namely:</p>
+<ul>
+<li><p>probability category 1: area from <span class="math inline">\(-\infty\)</span> to first threshold,</p></li>
+<li><p>probability category 2: area between first and second threshold,</p></li>
+<li><p>probability category 3: area between second threshold and <span class="math inline">\(\infty\)</span>.</p></li>
+</ul>
+<p>We can operator with the linear regression coefficients as usual, e.g., asking whether there is any reason to believe, given model and data, that the higher <code>MAD</code>, the higher the probability of seeing a more ‘uncertain’ trajectory type.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>fit_ordinal <span class="sc">|&gt;</span> </span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  tidybayes<span class="sc">::</span><span class="fu">gather_draws</span>(b_MAD) <span class="sc">|&gt;</span> </span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> .value, <span class="at">y =</span> .variable)) <span class="sc">+</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  tidybayes<span class="sc">::</span><span class="fu">stat_halfeye</span>() <span class="sc">+</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">""</span>) <span class="sc">+</span> <span class="fu">xlab</span>(<span class="st">""</span>) <span class="sc">+</span> ggplot2<span class="sc">::</span><span class="fu">xlim</span>(<span class="dv">0</span>,<span class="fl">0.03</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="03a-GLM-tutorial_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>brms<span class="sc">::</span><span class="fu">hypothesis</span>(fit_ordinal, <span class="st">"MAD &gt; 0"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>brms<span class="sc">::</span><span class="fu">hypothesis</span>(fit_ordinal, <span class="st">"MAD &gt; 0"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Hypothesis Tests for class b:
   Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio Post.Prob Star
-1  (MAD) &gt; 0     0.02         0     0.02     0.03        Inf         1    *
+1  (MAD) &gt; 0     0.01         0     0.01     0.01        Inf         1    *
 ---
 'CI': 90%-CI for one-sided and 95%-CI for two-sided hypotheses.
 '*': For one-sided hypotheses, the posterior probability exceeds 95%;
@@ -760,10 +831,30 @@ Posterior probabilities of point hypotheses assume equal prior probabilities.</c
 </div>
 </div>
 </section>
+</section>
 <section id="poisson-regression" class="level1">
 <h1>Poisson regression</h1>
+<section id="explanation-2" class="level2">
+<h2 class="anchored" data-anchor-id="explanation-2">Explanation</h2>
+<p>The <a href="https://michael-franke.github.io/intro-data-analysis/selected-discrete-distributions-of-random-variables.html#poisson-distribution">Poisson distribution</a> is the common choice for count data. It is defined as:</p>
+<p><span class="math display">\[
+\text{Poisson}(k ; \lambda) = \frac{\lambda^k \ \exp( -\lambda)} {k!}
+\]</span></p>
+<p>The link function is the exponential function (so the inverse link function is the logarithmic function). The Poisson regression model is defined as:</p>
+<p><span class="math display">\[
+\begin{align*}
+\xi  &amp;= X \beta       &amp;&amp; \color{gray}{\text{[linear predictor]}} \\
+\eta_i &amp;= \exp(\xi_i) &amp;&amp; \color{gray}{\text{[predictor of central tendency]}} \\
+y_i &amp; \sim \text{Poisson}(\eta_i) &amp;&amp; \color{gray}{\text{[likelihood]}}
+\end{align*}
+\]</span></p>
+</section>
+<section id="example-3" class="level2">
+<h2 class="anchored" data-anchor-id="example-3">Example</h2>
+<p>There are examples in the next exercise sheet. For a tutorial on Poisson regression specifically geared towards linguists see <a href="https://compass.onlinelibrary.wiley.com/doi/pdf/10.1111/lnc3.12439">here</a>.</p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

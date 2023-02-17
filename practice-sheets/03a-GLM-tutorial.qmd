@@ -26,6 +26,20 @@ This tutorial covers common types of generalized linear regression models:
 
 # Logistic regression
 
+## Explanation
+
+The [Bernoulli distribution](https://michael-franke.github.io/intro-data-analysis/selected-discrete-distributions-of-random-variables.html#app-91-distributions-bernoullihael-franke.github.io/intro-data-analysis/selected-discrete-distributions-of-random-variables.html#poisson-distribution) gives the probability of a single binary outcome when the bias for the reference outcome is $p$. The link function is the logistic function (so the inverse link function is the logit function). The logistic regression model is defined as:
+
+$$
+\begin{align*}
+\xi  &= X \beta       && \color{gray}{\text{[linear predictor]}} \\
+\eta_i &= \text{logistic}(\xi_i) && \color{gray}{\text{[predictor of central tendency]}} \\
+y_i & \sim \text{Bernoulli}(\eta_i) && \color{gray}{\text{[likelihood]}}
+\end{align*}
+$$
+
+## Example
+
 Our hypothesis is that typical examples are easier to classify, so they should have higher accuracy than atypical ones. We are also interested in additional effects of `group` on accuracy.
 
 As usual, we begin by plotting the relevant data.
@@ -186,7 +200,7 @@ sum_stats |>
 
 It is hard to say from visual inspection alone, whether there are any noteworthy differences. We might consider the following:
 
-- **Conjecture:** the /difference/ in probability between straight vs curved is higher when the target is on the right than when it is on the left. 
+-   **Conjecture:** the /difference/ in probability between straight vs curved is higher when the target is on the right than when it is on the left.
 
 This is not a real "research hypothesis" but a conjecture about the data. Let's still run a multinomial regression model to test address this conjecture.
 
@@ -229,7 +243,6 @@ fit_multinom |>
 **Exercise 2a**
 
 Look at the names of the coefficients in the fit summary to find out:What is the reference level for the categorical predictor variable?
-
 :::
 
 ```{r}
@@ -244,7 +257,6 @@ Look at the names of the coefficients in the fit summary to find out:What is the
 **Exercise 2b**
 
 Look at the names of the coefficients in the fit summary to find out: What is the reference level of the categories to be predicted in the multinomial model?
-
 :::
 
 ```{r}
@@ -255,12 +267,10 @@ Look at the names of the coefficients in the fit summary to find out: What is th
 # The reference category is 'straight' because we have regression coeffiecient for all but the 'straight' category.
 ```
 
-
 ::: callout-caution
 **Exercise 2c**
 
 Can you extract information about our conjecture from this plot (or the summary of the model fit)?
-
 :::
 
 ```{r}
@@ -276,7 +286,6 @@ Can you extract information about our conjecture from this plot (or the summary 
 **Exercise 2d**
 
 Use the postrior means of the regression coefficients to compute the corresponding scores $s_i$ and class probabilities $c_i$. Compare these to the observed frequencies.
-
 :::
 
 ```{r}
@@ -313,25 +322,47 @@ sum_stats |> ungroup() |>
 
 # Ordinal regression
 
-```{r}
-dolphin_prepped2 <- dolphin_prepped |> 
-    mutate(prototype_label = factor(prototype_label, ordered = T))
-```
+## Example
+
+The kind of mouse-trajectories, as categorized in variable `prototype_label`, are plausibly ordered by the "amount of deviation". The following therefore tries to predict the ordered category `prototype_label` from the numerical measure `MAD`. Here is a plot of how this would look like:
 
 ```{r}
+# prepare data by making 'prototype_label' an ordered factor
+dolphin_prepped2 <- dolphin_prepped |> 
+    mutate(prototype_label = factor(prototype_label, ordered = T))
+
+# plotting the ordered categories as a function of MAD
 dolphin_prepped2 |> 
-  ggplot(aes(x = MAD, y = prototype_label, color = prototype_label)) +
+  ggplot(aes(x = MAD, y = prototype_label, 
+             color = prototype_label)) +
   geom_jitter(alpha = 0.3,height = 0.3, width = 0)
 ```
 
+To run an ordinal regression model, we specify `family = cumulative(link="probit")`. The parameter `link="probit"` specifies the link function to be of the normal family (the link function is a cumulative normal distribution, the inverse of which is called "probit" function).
 
 ```{r}
 fit_ordinal <- brm(
   formula = prototype_label ~ MAD,
   data = dolphin_prepped2,
-  family = cumulative()
+  family = cumulative(link= "probit")
 )
 ```
+
+The summary output for this fitted model gives information about the slope of the predictor variable `MAD` as usual. But it also supplies information about two (!) intercepts: these are the cutoff points for the different categories in the cumulative normal link function.
+
+```{r}
+summary(fit_ordinal)
+```
+
+Concretely, this means that if `MAD` is \$x\$, we compute the linear predictor $\xi = \beta_{\text{MAD}} x$ (without intercept!), and then "imagine around it" a standard normal distribution, i.e., consider the normal distribution \$\\mathcal{\\xi, 1}\$. The probabilities of the three categories are given by the areas under the curve of this normal distribution, namely:
+
+-   probability category 1: area from $-\infty$ to first threshold,
+
+-   probability category 2: area between first and second threshold,
+
+-   probability category 3: area between second threshold and $\infty$.
+
+We can operator with the linear regression coefficients as usual, e.g., asking whether there is any reason to believe, given model and data, that the higher `MAD`, the higher the probability of seeing a more 'uncertain' trajectory type.
 
 ```{r}
 fit_ordinal |> 
@@ -341,12 +372,30 @@ fit_ordinal |>
   ylab("") + xlab("") + ggplot2::xlim(0,0.03)
 ```
 
-
 ```{r}
 brms::hypothesis(fit_ordinal, "MAD > 0")
 ```
 
-
 # Poisson regression
 
-see example in the next (exercise sheets)
+## Explanation
+
+The [Poisson distribution](https://michael-franke.github.io/intro-data-analysis/selected-discrete-distributions-of-random-variables.html#poisson-distribution) is the common choice for count data. It is defined as:
+
+$$
+\text{Poisson}(k ; \lambda) = \frac{\lambda^k \ \exp( -\lambda)} {k!}
+$$
+
+The link function is the exponential function (so the inverse link function is the logarithmic function). The Poisson regression model is defined as:
+
+$$
+\begin{align*}
+\xi  &= X \beta       && \color{gray}{\text{[linear predictor]}} \\
+\eta_i &= \exp(\xi_i) && \color{gray}{\text{[predictor of central tendency]}} \\
+y_i & \sim \text{Poisson}(\eta_i) && \color{gray}{\text{[likelihood]}}
+\end{align*}
+$$
+
+## Example
+
+There are examples in the next exercise sheet. For a tutorial on Poisson regression specifically geared towards linguists see [here](https://compass.onlinelibrary.wiley.com/doi/pdf/10.1111/lnc3.12439).
