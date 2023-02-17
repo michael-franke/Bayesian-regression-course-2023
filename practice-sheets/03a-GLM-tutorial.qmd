@@ -17,26 +17,86 @@ callout-appearance: simple
 dolphin <- aida::data_MT
 ```
 
-This tutorial covers common types of generalized linear regression models:
+This tutorial covers common types of generalized linear regression models (GLMs):
 
 -   logistic regression
 -   multinomial regression
 -   ordinal regression
 -   Poisson regression
 
+The shared form of all of these GLMs is the following "feed-forward computation" (here illustrated for a single datum of the predicted variable $y$ for a vector $x$ of predictor variables and a vector of coefficients $\beta$:
+
+1.  compute a **linear predictor**: $\xi = x \cdot \beta$;
+2.  compute a **predictor of central tendency** using an appropriate link function $\text{LF}$: $\eta = \text{LF}(\xi ; \theta_{\text{LF}})$;
+3.  determine the **likelihood function** $\text{LH}$: $y \sim \text{LH}(\eta; \theta_{\text{LH}})$.
+
+Link function and likelihood function may have additional free parameters, $\theta_{\text{LF}}$ and $\theta_{\text{LH}}$, to be fitted alongside the regression coefficients.
+
+Simple linear regression is the special case of this scheme where the link function is just the identity function and the likelihood is given by \$y \\sim \\mathcal{N}(\\eta; \\sigma)\$. Different types of regression are used to account for different kinds predicted variable $y$:
+
+| type of $y$ |             (inverse) link function             |         likelihood function          |
+|:--------------------|:------------------------:|:------------------------:|
+| metric      |                  $\eta = \xi$                   | $y \sim \text{Normal}(\eta; \sigma)$ |
+| binary      |          $\eta = \text{logistic}(\xi)$          |   $y \sim \text{Bernoulli}(\eta)$    |
+| nominal     |          $\eta = \text{soft-max}(\xi)$          | $y \sim \text{Categorical}({\eta})$  |
+| ordinal     | $\eta = \text{cumulative-logit}(\xi; {\delta})$ | $y \sim \text{Categorical}({\eta})$  |
+| count       |               $\eta = \exp(\xi)$                |    $y \sim \text{Poisson}(\eta)$     |
+
 # Logistic regression
 
 ## Explanation
 
-The [Bernoulli distribution](https://michael-franke.github.io/intro-data-analysis/selected-discrete-distributions-of-random-variables.html#app-91-distributions-bernoullihael-franke.github.io/intro-data-analysis/selected-discrete-distributions-of-random-variables.html#poisson-distribution) gives the probability of a single binary outcome when the bias for the reference outcome is $p$. The link function is the logistic function (so the inverse link function is the logit function). The logistic regression model is defined as:
+In logistic regression, the response variable $y$ is binary, i.e., we want to predict the probability $p$ with which one of two possible outcomes (henceforth: the reference outcome) occurs. The likelihood function for this case is the [Bernoulli distribution](https://michael-franke.github.io/intro-data-analysis/selected-discrete-distributions-of-random-variables.html#app-91-distributions-bernoullihael-franke.github.io/intro-data-analysis/selected-discrete-distributions-of-random-variables.html#poisson-distribution). This requires a link function $LF$ that maps real-valued linear predictor values $\xi$ onto the unit interval. A common choice is the **logistic function**:
+
+$$
+\text{logistic}(\xi) = \frac{1}{1+ \exp(-\xi)} = \eta
+$$
+
+```{r}
+#| echo: false
+
+logistic = function(x) return( 1 / (1 + exp(- 1 * (x - 0))) )
+ggplot(data.frame(x = c(-5,5)), aes(x)) +
+         stat_function(fun = logistic, color = project_colors[2], size = 2) +
+  labs(label = "logistic function", x = latex2exp::TeX("$\\xi$"), y = latex2exp::TeX("$\\eta$ = logistic($\\xi$)")) + ggtitle("logistic function")
+
+
+```
+
+The logistic regression model is then defined as:
 
 $$
 \begin{align*}
-\xi  &= X \beta       && \color{gray}{\text{[linear predictor]}} \\
-\eta_i &= \text{logistic}(\xi_i) && \color{gray}{\text{[predictor of central tendency]}} \\
-y_i & \sim \text{Bernoulli}(\eta_i) && \color{gray}{\text{[likelihood]}}
+\xi  &= x \cdot \beta       && \color{gray}{\text{[linear predictor]}} \\
+\eta &= \text{logistic}(\xi) && \color{gray}{\text{[predictor of central tendency]}} \\
+y & \sim \text{Bernoulli}(\eta) && \color{gray}{\text{[likelihood]}}
 \end{align*}
 $$
+
+The linear predictor values $\xi$ can be interpreted directly, as the log odds-ratio of the predicted probability $\eta$. This is because the inverse of the logistic function is the **logit function**, which has the following form:
+
+$$
+\text{logit}(\eta) = \log \frac{\eta}{1-\eta} = \xi
+$$
+
+```{r}
+logit = function(x) return( log(x/(1-x)) )
+ggplot(data.frame(x = c(0.001,1-0.001)), aes(x)) +
+         stat_function(fun = logit, color = project_colors[2], size = 2) +
+  labs(label = "logit function", x = latex2exp::TeX("$\\eta$"), y = latex2exp::TeX("$\\xi$ = logistic($\\eta$)")) +
+  ggtitle("logit function")
+```
+
+That also means that a difference in linear predictor parameters, e.g., in a logistic regression with a single binary categorical predictor variable (group A vs. group B), can be interpreted directly as something like the "evidence ratio" or "Bayes factor". It is the log of the factor by which to transform log odds-ratios (e.g., changing beliefs from $\eta_1$ to $\eta_2$:
+
+$$
+\begin{align*}
+& \xi_1 - \xi_2 = \log \frac{\eta_1}{1-\eta_1} - \log \frac{\eta_2}{1-\eta_2} = \log \left ( \frac{\eta_1}{1-\eta_1} \frac{1-\eta_2}{\eta_2}\right ) \\
+\Leftrightarrow & \frac{\eta_1}{1-\eta_1} = \exp (\xi_1 - \xi_2) \ \frac{\eta_2}{1-\eta_2}
+\end{align*}
+$$
+
+For the purposes of understanding which priors are weakly or strongly informative, a unit difference in the linear predictor can be interpreted as a log Bayes factor (changing prior odds to posterior odds). So a unit difference in the predictor value corresponds to a Bayes factor of around 2.72.
 
 ## Example
 
@@ -113,7 +173,7 @@ compare_groups(
 ::: callout-caution
 **Exercise 1b**
 
-If you look back at the plot of accuracy, it looks as if the change from atypical to typical condition had a reverse effect for the click and the touch group, i.e., it seems that ther is an interaction between these two variables (`group` and `condition`). Use the function `brms::hypothesis()` to examin the interaction term of the model fit. What do you conclude from this?
+If you look back at the plot of accuracy, it looks as if the change from atypical to typical condition does not have the same effect, at least not at the same level of strength, for the click and the touch group, i.e., it seems that there is an interaction between these two variables (`group` and `condition`). Use the function `brms::hypothesis()` to examine the interaction term of the model fit. What do you conclude from this?
 :::
 
 ```{r}
@@ -321,6 +381,28 @@ sum_stats |> ungroup() |>
 ```
 
 # Ordinal regression
+
+## Explanation
+
+When $k>2$ categories have a natural ordering, the problem of predicting probabilities for each category can be simplified by taking this ordering into account. A common choice of link function for this case is the **cumulative logit function** which takes the linear predictor and a vector $\delta$ of $k-1$ thresholds as arguments to return a probability vector, here denoted as $\eta$, whose components are defined like so:
+
+$$
+\eta_i = \text{cumulative-logit}(\xi; \delta) = \begin{cases}
+\text{logistic}(\delta_1) & \text{if } i=1 \\
+\text{logistic}(\delta_{i}) - \text{logistic}(\delta_{i-1}) & \text{if } i=1 \\
+\end{cases}
+$$
+
+
+In sum, the cumulative-logit model for ordinal regression, is defined as follows:
+
+$$
+\begin{align*}
+\xi  &= X \beta       && \color{gray}{\text{[linear predictor]}} \\
+\eta &= \text{cumulative-logit}(\xi; \delta) && \color{gray}{\text{[predictor of central tendency]}} \\
+y & \sim \text{Categorical}(\eta) && \color{gray}{\text{[likelihood]}}
+\end{align*}
+$$
 
 ## Example
 

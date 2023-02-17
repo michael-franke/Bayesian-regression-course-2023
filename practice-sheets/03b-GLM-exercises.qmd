@@ -31,7 +31,6 @@ dolphin_agg <- dolphin %>%
 **Exercise 1a**
 
 Plot straight (`straight == 1`) vs. non-straight (`straight == 0`) trajectories (y-axis) against `log_RT_s` and color-code by `group`.
-
 :::
 
 ```{r}
@@ -52,7 +51,6 @@ ggplot(data = dolphin_agg) +
 **Exercise 1b**
 
 Run the appropriate generalized linear model in `brms` that predicts straight vs. non-straight trajectories based on `group`, `log_RT_s`, and their two-way interaction.
-
 :::
 
 ```{r}
@@ -72,7 +70,6 @@ GlmMdl
 **Exercise 1c**
 
 Describe the model predictions based on the posterior means of the population coefficients.
-
 :::
 
 ```{r}
@@ -86,12 +83,10 @@ Describe the model predictions based on the posterior means of the population co
 
 ```
 
-
 ::: callout-caution
 **Exercise 1d**
 
 Extract the posteriors means and 95% CrIs for the relationships between `straight`, `log_RT_s` and `group` for representative range of `log_RT_s` values. Plot the logistic regression lines for both groups into one graph. Color code the regression lines according to `group`.
-
 :::
 
 ```{r}
@@ -139,7 +134,6 @@ ggplot(data = predicted_values) +
 **Exercise 1e**
 
 Assume we want to predict `correct` responses based on `condition`. We look at the touch group only. Set up a data frame and plot the data as a point plot. (Remember how to jitter the data points)
-
 :::
 
 ```{r}
@@ -160,12 +154,10 @@ ggplot(data = dolphin_agg2) +
 
 ```
 
-
 ::: callout-caution
 **Exercise 1f**
 
 Run the appropriate generalized linear model in `brms` that predicts `correct` responses based on `condition`. Extract the posterior means and 95% CrIs for the effect of `condition` on `correct` and plot them as points and whiskers into one plot superimposed on the data.
-
 :::
 
 ```{r}
@@ -206,7 +198,6 @@ ggplot(data = predicted_values) +
 
 ```
 
-
 # Exercise 2: Poisson regression
 
 We will continue to use `dolphin_agg` in this exercise.
@@ -215,7 +206,6 @@ We will continue to use `dolphin_agg` in this exercise.
 **Exercise 2b**
 
 Plot the relationship between `xpos_flips` and `log_RT_s` in a scatterplot and visually differentiate between `condition`s as you see fit.
-
 :::
 
 ```{r}
@@ -236,7 +226,6 @@ ggplot(data = dolphin_agg) +
 **Exercise 2b**
 
 Run an appropriate generalized regression model for xflips with `brms` to predict `xpos_flips` based on `log_RT_s`, `condition`, and their two-way interaction.
-
 :::
 
 ```{r}
@@ -255,7 +244,6 @@ GlmMdl3
 **Exercise 2c**
 
 Extract the posterior means and 95% CrIs across a range of representative values of log_RT_s (see walkthrough) for both conditions and plot them against the data (as done before in walkthrough and exercise 1).
-
 :::
 
 ```{r}
@@ -293,12 +281,11 @@ ggplot(data = predicted_Poisson_values, aes(x = log_RT)) +
 
 ```
 
-
 # Exercise 3: Logistic regression with binomial likelihood
 
 Binary logistic regression assumes that the outcome variable comes from a Bernoulli distribution which is a special case of a binomial distribution where the number of trial $n = 1$ and thus the outcome variable can only be 1 or 0. In contrast, binomial logistic regression assumes that the number of the target events follows a binomial distribution with $n$ trials and probability $q$. Read up on Binomial data with `brms` here: https://www.rensvandeschoot.com/tutorials/generalised-linear-models-with-brms/
 
-Take the following subset of the `dolphin` data frame that only contains `correct` responses (= `1`). 
+Take the following subset of the `dolphin` data frame that only contains `correct` responses (= `1`).
 
 ```{r}
 #| eval: true
@@ -311,12 +298,10 @@ dolphin_sub <- dolphin %>%
 
 ```
 
-
 ::: callout-caution
 **Exercise 3a**
 
 For each `subject_id` in each `group`, aggregate the mean log_RT_s, the number of trials that are classified as `straight` trajectories, and the total number of trials. Plot the proportion of trials that are classified as `straight` (vs. all trials) trajectories for each subject.
-
 :::
 
 ```{r}
@@ -400,7 +385,6 @@ ggplot(data = predicted_values) +
 **Exercise 3c**
 
 Now compare the results from this analysis to the results from the model 1b above which you plotted in 1d. How do the model results differ and why could that be? (Feel free to explore the data to understand what is going on)
-
 :::
 
 ```{r}
