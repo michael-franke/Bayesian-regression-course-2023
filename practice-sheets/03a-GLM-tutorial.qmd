@@ -388,10 +388,99 @@ When $k>2$ categories have a natural ordering, the problem of predicting probabi
 
 $$
 \eta_i = \text{cumulative-logit}(\xi; \delta) = \begin{cases}
-\text{logistic}(\delta_1) & \text{if } i=1 \\
-\text{logistic}(\delta_{i}) - \text{logistic}(\delta_{i-1}) & \text{if } i=1 \\
+\text{logistic}(\delta_1 - \xi) & \text{if } i=1 \\
+\text{logistic}(\delta_{i} - \xi) - \eta_i & \text{if } i>1 \\
 \end{cases}
 $$
+To see what is going on, consider the a case with three categories. Fix the two threshold $\delta_1=-0.75$ and $\delta_2=1.6$ just for illustration. Now assume that we have a case there the linear predictor value $\eta$ is zero. The cumulative logit function above then entails the category probabilities as shown in this plot, as the length of the colored bar segments: 
+
+```{r}
+#| echo: false
+
+k1 <- -0.75
+k2 <- 1.6
+k1_color <- project_colors[3]
+k2_color <- project_colors[5]
+k3_color <- project_colors[6]
+seg_size = 2
+
+tibble(x = seq(-4,4, length.out = 100),
+       y = logistic(x)) |> 
+  ggplot(aes(x,y)) +
+  # logistic function
+  geom_line() +
+  # segments for k1
+  geom_segment(aes(x = k1, y = 0, xend = k1, yend = logistic(k1)), color = "darkgray") +
+  geom_segment(aes(x = k1, y = logistic(k1), xend = -4, yend = logistic(k1)), color = "darkgray") +
+  geom_segment(aes(x = 0,  y = 0, xend = 0,  yend = logistic(k1)), color = k1_color, size = seg_size) +
+  # segments for k2
+  geom_segment(aes(x = k2, y = 0, xend = k2, yend = logistic(k2)), color = "darkgray") +
+  geom_segment(aes(x = k2, y = logistic(k2), xend = -4, yend = logistic(k2)), color = "darkgray") +
+  geom_segment(aes(x = 0,  y = logistic(k1), xend = 0,  yend = logistic(k2)), color = k2_color, size = seg_size) +
+  # segments for k2
+  geom_segment(aes(x = 0,  y = logistic(k2), xend = 0,  yend = 1), color = k3_color, size = seg_size) +
+  # custom ticks & labels
+  scale_x_continuous(breaks = c(k1, 0, k2), 
+                     labels = c(latex2exp::TeX("$\\delta_1$"), 
+                                0, 
+                                latex2exp::TeX("$\\delta_2$"))) +
+  scale_y_continuous(breaks = c(0, logistic(k1), logistic(k2), 1), 
+                     labels = c(
+                       0,
+                       latex2exp::TeX("logistic($\\delta_1$)"), 
+                       latex2exp::TeX("logistic($\\delta_2$)"),
+                       1
+                     )) +
+  # add category probabilities
+  
+  # remove axis labels
+  xlab("") + ylab("")
+```
+
+If the linear predictor $\eta$ is estimated to be bigger than zero, this intuitively means that we shift all of the threshold to the left (by the same amount). For example, the plot below shows the case of $\eta=1$ where the probability of the first category decreases while that of the third increases.
+
+```{r}
+#| echo: false
+
+k1 <- -0.75 - 1
+k2 <- 1.6 - 1
+k1_color <- project_colors[3]
+k2_color <- project_colors[5]
+k3_color <- project_colors[6]
+seg_size = 2
+
+tibble(x = seq(-4,4, length.out = 100),
+       y = logistic(x)) |> 
+  ggplot(aes(x,y)) +
+  # logistic function
+  geom_line() +
+  # segments for k1
+  geom_segment(aes(x = k1, y = 0, xend = k1, yend = logistic(k1)), color = "darkgray") +
+  geom_segment(aes(x = k1, y = logistic(k1), xend = -4, yend = logistic(k1)), color = "darkgray") +
+  geom_segment(aes(x = 0,  y = 0, xend = 0,  yend = logistic(k1)), color = k1_color, size = seg_size) +
+  # segments for k2
+  geom_segment(aes(x = k2, y = 0, xend = k2, yend = logistic(k2)), color = "darkgray") +
+  geom_segment(aes(x = k2, y = logistic(k2), xend = -4, yend = logistic(k2)), color = "darkgray") +
+  geom_segment(aes(x = 0,  y = logistic(k1), xend = 0,  yend = logistic(k2)), color = k2_color, size = seg_size) +
+  # segments for k2
+  geom_segment(aes(x = 0,  y = logistic(k2), xend = 0,  yend = 1), color = k3_color, size = seg_size) +
+  # custom ticks & labels
+  scale_x_continuous(breaks = c(k1, 0, k2), 
+                     labels = c(latex2exp::TeX("$\\delta_1-1$"), 
+                                0, 
+                                latex2exp::TeX("$\\delta_2-1$"))) +
+  scale_y_continuous(breaks = c(0, logistic(k1), logistic(k2), 1), 
+                     labels = c(
+                       0,
+                       latex2exp::TeX("logistic($\\delta_1-1$)"), 
+                       latex2exp::TeX("logistic($\\delta_2-1$)"),
+                       1
+                     )) +
+  # add category probabilities
+  
+  # remove axis labels
+  xlab("") + ylab("")
+```
 
 
 In sum, the cumulative-logit model for ordinal regression, is defined as follows:

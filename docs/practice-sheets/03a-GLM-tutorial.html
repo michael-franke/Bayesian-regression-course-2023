@@ -467,10 +467,10 @@ y &amp; \sim \text{Bernoulli}(\eta) &amp;&amp; \color{gray}{\text{[likelihood]}}
 # Groups:   group [2]
   group condition     n accuracy ci_lower  mean ci_upper
   &lt;chr&gt; &lt;chr&gt;     &lt;int&gt;    &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
-1 click Atypical    318    0.874    0.836 0.874    0.908
-2 click Typical     689    0.964    0.950 0.964    0.977
-3 touch Atypical    330    0.909    0.875 0.909    0.938
-4 touch Typical     715    0.941    0.923 0.941    0.958</code></pre>
+1 click Atypical    318    0.874    0.837 0.874    0.912
+2 click Typical     689    0.964    0.950 0.964    0.976
+3 touch Atypical    330    0.909    0.879 0.909    0.938
+4 touch Typical     715    0.941    0.922 0.941    0.958</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>sum_stats <span class="sc">|&gt;</span> </span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> condition, <span class="at">y =</span> accuracy, <span class="at">group =</span> group, <span class="at">color =</span> group)) <span class="sc">+</span></span>
@@ -504,15 +504,15 @@ Formula: correct ~ group * condition
 
 Population-Level Effects: 
                             Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-Intercept                       1.95      0.17     1.63     2.27 1.00     2112
-grouptouch                      0.37      0.26    -0.13     0.88 1.00     1739
-conditionTypical                1.35      0.26     0.84     1.86 1.00     1795
-grouptouch:conditionTypical    -0.89      0.36    -1.60    -0.21 1.00     1627
+Intercept                       1.94      0.17     1.62     2.29 1.00     2263
+grouptouch                      0.37      0.27    -0.14     0.92 1.00     1750
+conditionTypical                1.35      0.27     0.83     1.88 1.00     1568
+grouptouch:conditionTypical    -0.88      0.38    -1.61    -0.15 1.00     1484
                             Tail_ESS
-Intercept                       2511
-grouptouch                      1942
-conditionTypical                2654
-grouptouch:conditionTypical     2163
+Intercept                       2737
+grouptouch                      2290
+conditionTypical                1851
+grouptouch:conditionTypical     1876
 
 Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -530,8 +530,8 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 <pre><code>Outcome of comparing groups: 
  * higher:  condition == "Typical" 
  * lower:   condition == "Atypical" 
-Mean 'higher - lower':  0.9071 
-95% HDI:  [ 0.5509 ; 1.269 ]
+Mean 'higher - lower':  0.9092 
+95% HDI:  [ 0.5613 ; 1.254 ]
 P('higher - lower' &gt; 0):  1 
 Posterior odds:  Inf </code></pre>
 </div>
@@ -696,15 +696,15 @@ Formula: prototype_label ~ target_position
 
 Population-Level Effects: 
                               Estimate Est.Error l-95% CI u-95% CI Rhat
-mucurved_Intercept               -1.71      0.09    -1.89    -1.53 1.00
-muCoM_Intercept                  -1.71      0.09    -1.90    -1.53 1.00
-mucurved_target_positionright    -0.44      0.14    -0.71    -0.16 1.00
-muCoM_target_positionright        0.00      0.13    -0.26     0.26 1.00
+mucurved_Intercept               -1.71      0.09    -1.90    -1.53 1.00
+muCoM_Intercept                  -1.71      0.09    -1.90    -1.54 1.00
+mucurved_target_positionright    -0.44      0.15    -0.72    -0.15 1.00
+muCoM_target_positionright       -0.00      0.13    -0.25     0.26 1.00
                               Bulk_ESS Tail_ESS
-mucurved_Intercept                4474     3569
-muCoM_Intercept                   4190     3083
-mucurved_target_positionright     3918     3193
-muCoM_target_positionright        4403     3067
+mucurved_Intercept                4752     3121
+muCoM_Intercept                   4253     2985
+mucurved_target_positionright     4109     3137
+muCoM_target_positionright        4354     2965
 
 Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -833,10 +833,21 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 <p>When <span class="math inline">\(k&gt;2\)</span> categories have a natural ordering, the problem of predicting probabilities for each category can be simplified by taking this ordering into account. A common choice of link function for this case is the <strong>cumulative logit function</strong> which takes the linear predictor and a vector <span class="math inline">\(\delta\)</span> of <span class="math inline">\(k-1\)</span> thresholds as arguments to return a probability vector, here denoted as <span class="math inline">\(\eta\)</span>, whose components are defined like so:</p>
 <p><span class="math display">\[
 \eta_i = \text{cumulative-logit}(\xi; \delta) = \begin{cases}
-\text{logistic}(\delta_1) &amp; \text{if } i=1 \\
-\text{logistic}(\delta_{i}) - \text{logistic}(\delta_{i-1}) &amp; \text{if } i=1 \\
+\text{logistic}(\delta_1 - \xi) &amp; \text{if } i=1 \\
+\text{logistic}(\delta_{i} - \xi) - \eta_i &amp; \text{if } i&gt;1 \\
 \end{cases}
-\]</span></p>
+\]</span> To see what is going on, consider the a case with three categories. Fix the two threshold <span class="math inline">\(\delta_1=-0.75\)</span> and <span class="math inline">\(\delta_2=1.6\)</span> just for illustration. Now assume that we have a case there the linear predictor value <span class="math inline">\(\eta\)</span> is zero. The cumulative logit function above then entails the category probabilities as shown in this plot, as the length of the colored bar segments:</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="03a-GLM-tutorial_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>If the linear predictor <span class="math inline">\(\eta\)</span> is estimated to be bigger than zero, this intuitively means that we shift all of the threshold to the left (by the same amount). For example, the plot below shows the case of <span class="math inline">\(\eta=1\)</span> where the probability of the first category decreases while that of the third increases.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="03a-GLM-tutorial_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
 <p>In sum, the cumulative-logit model for ordinal regression, is defined as follows:</p>
 <p><span class="math display">\[
 \begin{align*}
@@ -860,7 +871,7 @@ y &amp; \sim \text{Categorical}(\eta) &amp;&amp; \color{gray}{\text{[likelihood]
 <span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> prototype_label)) <span class="sc">+</span></span>
 <span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(<span class="at">alpha =</span> <span class="fl">0.3</span>,<span class="at">height =</span> <span class="fl">0.3</span>, <span class="at">width =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="03a-GLM-tutorial_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid" width="672"></p>
+<p><img src="03a-GLM-tutorial_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>To run an ordinal regression model, we specify <code>family = cumulative()</code>. This runs the default cumulative-logit model introduced at the beginning of the session.</p>
@@ -884,9 +895,9 @@ Formula: prototype_label ~ MAD
 
 Population-Level Effects: 
              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-Intercept[1]     4.04      0.17     3.71     4.40 1.00     2390     2492
-Intercept[2]     9.49      0.51     8.54    10.52 1.00     1453     1511
-MAD              0.02      0.00     0.02     0.03 1.00     1802     2191
+Intercept[1]     4.04      0.18     3.71     4.40 1.00     2214     2406
+Intercept[2]     9.49      0.52     8.53    10.57 1.00     1764     1803
+MAD              0.02      0.00     0.02     0.03 1.00     2243     2367
 
 Family Specific Parameters: 
      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
@@ -911,7 +922,7 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 <span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  tidybayes<span class="sc">::</span><span class="fu">stat_halfeye</span>() <span class="sc">+</span></span>
 <span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">""</span>) <span class="sc">+</span> <span class="fu">xlab</span>(<span class="st">""</span>) <span class="sc">+</span> ggplot2<span class="sc">::</span><span class="fu">xlim</span>(<span class="dv">0</span>,<span class="fl">0.03</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="03a-GLM-tutorial_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid" width="672"></p>
+<p><img src="03a-GLM-tutorial_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div class="cell">
