@@ -1,0 +1,60 @@
+\documentclass[fleqn,reqno,10pt]{article}
+
+\usepackage[]{mypackages}
+
+\usepackage{mycommands}
+
+\usepackage{verbatim}
+\usepackage[active,tightpage]{preview}
+\PreviewEnvironment{tikzpicture}
+\setlength\PreviewBorder{5pt}
+
+\usetikzlibrary{calc}
+
+\usepackage{pgfplots}
+
+\begin{document}
+
+
+\begin{tikzpicture}[node distance = 2.75cm, 
+    double distance = 2pt,
+    minimum size=1.25cm,
+    thick]
+    
+    \node[rectangle, draw=black, fill=black!30] (y)     {obs};
+
+    \node[circle, draw=black, above left of = y] (M1) {$a,b$};
+
+    \node[circle, draw=black, above right of = y] (M2)
+    {$c,d$};
+
+    \node[rectangle, draw=black, above of = y] (switch)
+    {$m$};
+
+    \draw[->] (M1)--(y);
+
+    \draw[->] (M2)--(y);
+
+    \draw[->] (switch)--(y);
+
+
+    \begin{scope}[xshift = 5cm, node distance = 1.5cm]
+
+      \node[] (LH) {$obs \sim
+        \begin{cases}
+          \text{lhExpo}(a,b) & \text{if $m$ = 0} \\
+          \text{lhPow}(c,d) & \text{if $m$ = 1} \\
+        \end{cases}$};
+
+      \node[above of = LH] (paramProb) {$a,b,c,d \sim \text{Unif}(0,1.5)$};
+
+      \node[above of = paramProb] (mProb) {$m \sim \text{Bern}(0.5)$};
+
+    \end{scope}
+
+  \end{tikzpicture}
+
+
+\printbibliography[heading=bibintoc]
+
+\end{document}

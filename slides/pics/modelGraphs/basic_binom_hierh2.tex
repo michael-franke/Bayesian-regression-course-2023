@@ -1,0 +1,59 @@
+\documentclass[fleqn,reqno,10pt]{article}
+
+\usepackage[]{mypackages}
+
+\usepackage{mycommands}
+
+\usepackage{verbatim}
+\usepackage[active,tightpage]{preview}
+\PreviewEnvironment{tikzpicture}
+\setlength\PreviewBorder{5pt}
+
+\usetikzlibrary{calc}
+
+\usepackage{pgfplots}
+
+\begin{document}
+
+
+\begin{tikzpicture}[node distance = 2cm, 
+    double distance = 2pt,
+    minimum size=1.25cm,
+    thick]
+    
+    \node[rectangle, draw=black, fill=black!30] (k)
+    {k};
+
+    \node[circle, draw=black,
+    above of = k] (theta) {$\theta$};
+
+    \node[circle, draw = black, above left of = theta] (omega) {$\mu$};
+
+    \node[circle, draw = black, above right of = theta] (kappa) {$v$};
+
+    \draw[->] (theta)--(k);
+
+    \draw[->] (omega)--(theta);
+
+    \draw[->] (kappa)--(theta);
+
+
+    \begin{scope}[xshift = 5.75cm, node distance = 1.33cm]
+
+      \node[] (nProb) {$k \sim \text{Binomial}(\theta, N)$};
+
+      \node[above of = nProb] (thetaProb) {$\theta \sim \text{Beta}(\mu v,
+        (1-\mu) v)$}; 
+
+      \node[above of = thetaProb] (kappaProb) {$v \sim \text{Uniform}(1,100)$};
+
+      \node[above of = kappaProb] (omegaProb) {$\mu \sim \text{Beta}(1,1)$};
+
+    \end{scope}
+
+  \end{tikzpicture}
+
+
+\printbibliography[heading=bibintoc]
+
+\end{document}

@@ -1,0 +1,56 @@
+\documentclass[fleqn,reqno,10pt]{article}
+
+\usepackage[]{mypackages}
+
+\usepackage{mycommands}
+
+\usepackage{verbatim}
+\usepackage[active,tightpage]{preview}
+\PreviewEnvironment{tikzpicture}
+\setlength\PreviewBorder{5pt}
+
+\usetikzlibrary{calc}
+
+\usepackage{pgfplots}
+
+\begin{document}
+
+
+\begin{tikzpicture}[node distance = 2cm, 
+    double distance = 2pt,
+    minimum size=1.25cm,
+    thick]
+    
+    \node[rectangle, draw=black, fill=black!30] (k)
+    {k};
+
+    \node[circle, draw=black,
+    above of = k] (theta) {$\theta$};
+
+    \node[circle, draw = black, above left of = theta] (a) {$a$};
+
+    \node[circle, draw = black, above right of = theta] (b) {$b$};
+
+    \draw[->] (theta)--(k);
+
+    \draw[->] (a)--(theta);
+
+    \draw[->] (b)--(theta);
+
+
+    \begin{scope}[xshift = 4.5cm, node distance = 1.66cm]
+
+      \node[] (nProb) {$k \sim \text{Binomial}(\theta, N)$};
+
+      \node[above of = nProb] (thetaProb) {$\theta \sim \text{Beta}(a,b)$};
+
+      \node[above of = thetaProb] (abProb) {$a,b \sim \text{Gamma}(1,1)$};
+
+    \end{scope}
+
+  \end{tikzpicture}
+
+
+\printbibliography[heading=bibintoc]
+
+\end{document}

@@ -9,7 +9,8 @@ pckgs_needed <- c(
   "tidyverse",
   "brms",
   "remotes",
-  "tidybayes"
+  "tidybayes",
+  "shinystan"
 )
 pckgs_installed <- installed.packages()[,"Package"]
 pckgs_2_install <- pckgs_needed[!(pckgs_needed %in% pckgs_installed)]

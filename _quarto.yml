@@ -38,6 +38,20 @@ website:
             text: GLM (tutorial)
           - href: practice-sheets/03b-GLM-exercises.qmd
             text: GLM (exercises)
+      - section: "04: MCMC sampling"
+        contents:
+          - href: 04-MCMC.qmd
+            text: Overview
+          - href: practice-sheets/04a-MCMC-diagnostics.qmd
+            text: MCMC diagnostics (tutorial)
+      - section: "05: Hierarchical models"
+        contents:
+          - href: 05-hierarchical-models.qmd
+            text: Overview
+          - href: practice-sheets/05a-hierarchical-models-tutorial.qmd
+            text: Hierarchical models (tutorial)
+          - href: practice-sheets/05b-hierarchical-models-exercises.qmd
+            text: Hierarchical models (exercises)
 format:
   html:
     theme: cosmo

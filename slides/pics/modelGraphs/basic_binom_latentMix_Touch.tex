@@ -1,0 +1,95 @@
+\documentclass[fleqn,reqno,10pt]{article}
+
+\RequirePackage{amsmath}            % Formeln
+\RequirePackage{amsfonts}           % Fonts for Formulas
+\RequirePackage{amssymb}
+
+\RequirePackage{amsthm}
+
+\RequirePackage{dsfont}             % double stroke fonts
+
+\RequirePackage[final]{graphicx}
+
+\RequirePackage{relsize} % provides command \relsize{+/-x} for relative
+                     % font size changes
+\RequirePackage[ngerman,english]{babel}
+\RequirePackage[utf8]{inputenc}
+\RequirePackage[T1]{fontenc} 
+\RequirePackage{xypic}
+
+
+\RequirePackage{tikz}
+\usetikzlibrary{arrows,shapes,automata,backgrounds,petri,fit,decorations.pathmorphing}
+
+\RequirePackage{xspace} % for \xspace in definition of acronyms etc.
+
+
+% \usepackage{mycommands}
+
+\usepackage{verbatim}
+\usepackage[active,tightpage]{preview}
+\PreviewEnvironment{tikzpicture}
+\setlength\PreviewBorder{5pt}
+
+\usetikzlibrary{calc}
+
+\usepackage{pgfplots}
+
+\begin{document}
+
+
+\begin{tikzpicture}[node distance = 2cm, 
+    double distance = 2pt,
+    minimum size=1.25cm,
+    thick]
+
+    \node[rectangle, draw=black, fill=black!30] (N)
+    {$N_i$};
+
+    \node[below of = N, node distance = 1.5cm] (i)
+    {$i$ subject};
+   
+    \node[above of = N, rectangle, draw=black, fill=black!30] (k)
+    {$k_i$};
+
+    \node[circle, draw=black,
+    above of = k] (theta) {$\theta_i$};
+
+    \node[circle, draw = black, above left of = theta] (omega) {$\mu$};
+
+    \node[circle, draw = black, above right of = theta] (kappa) {$v$};
+
+    \draw[->] (N)--(k);
+
+    \draw[->] (theta)--(k);
+
+    \draw[->] (omega)--(theta);
+
+    \draw[->] (kappa)--(theta);
+
+    \begin{pgfonlayer}{background}
+       \node [rounded corners,
+       very thick,draw=black!40,fit={($(N.south)+(0,-30pt)$) 
+                                 ($(theta.east)+(+7pt,0)$) 
+                                 ($(theta.north)+(0,+2.5pt)$) 
+                                 ($(theta.west)+(-7pt,0)$)}] {};
+    \end{pgfonlayer}
+
+
+    \begin{scope}[xshift = 5.75cm, node distance = 1.33cm]
+
+      \node[] (nProb) {$k_i \sim \text{Binomial}(\theta_i, N_i)$};
+
+      \node[above of = nProb] (thetaProb) {$\theta_i \sim \text{Beta}(\mu v,
+        (1-\mu) v)$}; 
+
+      \node[above of = thetaProb] (kappaProb) {$v \sim \text{Uniform}(1,100)$};
+
+      \node[above of = kappaProb] (omegaProb) {$\mu \sim \text{Beta}(1,1)$};
+
+    \end{scope}
+
+  \end{tikzpicture}
+
+
+\end{document}
