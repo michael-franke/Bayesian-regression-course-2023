@@ -1,0 +1,106 @@
+\documentclass[fleqn,reqno,10pt]{article}
+
+\usepackage[]{mypackages}
+
+\usepackage{mycommands}
+
+\usepackage{verbatim}
+\usepackage[active,tightpage]{preview}
+\PreviewEnvironment{tikzpicture}
+\setlength\PreviewBorder{5pt}
+
+\usetikzlibrary{calc}
+
+\usepackage{pgfplots}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% custom commands
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\lit}{\acro{lit}}
+\newcommand{\glb}{\acro{glb}}
+\newcommand{\loc}{\acro{loc}}
+
+\newcommand{\as}{\acro{as}}
+\renewcommand{\es}{\acro{es}}
+\renewcommand{\AE}{\as}
+\newcommand{\GE}{\es}
+\newcommand{\ea}{\acro{ea}}
+
+\newcommand{\lc}{\acro{lc}}
+\newcommand{\ec}{\acro{ec}}
+\newcommand{\LC}{\lc}
+\newcommand{\EC}{\ec}
+
+\begin{document}
+
+
+\begin{tikzpicture}[node distance = 2cm, 
+    double distance = 2pt,
+    minimum size=1.25cm,
+    thick]
+    
+    \node[rectangle, draw=black, fill=black!30] (obs)
+    {obs$_k$};
+
+    \node[rectangle, draw=black, fill=black!30,
+    right of = obs] (n) {$n_k$};
+
+    \node[below of = n, node distance= 1.5cm]
+    (anchor) {};
+
+    \node[left of = anchor, node distance= 0.95cm] (k) {$k \in
+      \set{\text{\as-ntr, \as-acc, \dots}}$};
+
+    \node[circle, double, draw=black,
+    above of = obs] (t) {$\myvec{t}_k$};
+
+    \node[circle, draw=black, 
+    above of = t] (p) {$\myvec{p}_k$};
+
+    \node[circle, draw=black, 
+    right of = p] (e) {$e_k$};
+
+    \node[circle, draw=black, 
+    left of = p] (q) {$q$};
+
+    \draw[->] (t)--(obs);
+
+    \draw[->] (n)--(obs);
+
+    \draw[->,shorten >=0.05cm] (q)--(t);
+
+    \draw[->,shorten >=0.05cm] (p)--(t);
+
+    \draw[->,shorten >=0.05cm] (e)--(t);
+
+    \begin{pgfonlayer}{background}
+       \node [rounded corners,
+       very thick,draw=black!40,fit={($(obs.south)+(0,-30pt)$) 
+                                 ($(n.east)+(+5pt,0)$) 
+                                 ($(e.north)+(0,+5pt)$) 
+                                 ($(p.west)+(-5pt,0)$)}] {};
+    \end{pgfonlayer}
+
+    \begin{scope}[xshift = 6.5cm, node distance = 1cm]
+
+      \node[] (obsd) {$\text{obs}_k \sim \text{Multinomial}(\myvec{t}_k,n_k)$};
+
+      \node[above of = obsd] (td) {$\myvec{t}_k = \text{as described
+          in text}$};
+
+      \node[above of = td] (pd) {$\myvec{p}_k \sim
+        \text{unbiased Dirichlet}$};
+
+      \node[above of = pd] (ed) {$e_k \sim \mathcal{U}(0,.2)$};
+
+      \node[above of = ed] (qd) {$q \sim \mathcal{U}(0,1)$};
+
+    \end{scope}
+
+  \end{tikzpicture}
+
+
+\printbibliography[heading=bibintoc]
+
+\end{document}

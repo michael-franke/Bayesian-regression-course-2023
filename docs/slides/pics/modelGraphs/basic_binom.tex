@@ -1,0 +1,46 @@
+\documentclass[fleqn,reqno,10pt]{article}
+
+\usepackage[]{mypackages}
+
+\usepackage{mycommands}
+
+\usepackage{verbatim}
+\usepackage[active,tightpage]{preview}
+\PreviewEnvironment{tikzpicture}
+\setlength\PreviewBorder{5pt}
+
+\usetikzlibrary{calc}
+
+\usepackage{pgfplots}
+
+\begin{document}
+
+
+\begin{tikzpicture}[node distance = 2cm, 
+    double distance = 2pt,
+    minimum size=1.25cm,
+    thick]
+    
+    \node[rectangle, draw=black, fill=black!30] (k)
+    {k};
+
+    \node[circle, draw=black,
+    above of = k] (theta) {$\theta$};
+
+    \draw[->] (theta)--(k);
+
+
+    \begin{scope}[xshift = 3.5cm, node distance = 2cm]
+
+      \node[] (nProb) {$k \sim \text{Binomial}(\theta, N)$};
+
+      \node[above of = nProb] (thetaProb) {$\theta \sim \text{Beta}(1,1)$};
+
+    \end{scope}
+
+  \end{tikzpicture}
+
+
+\printbibliography[heading=bibintoc]
+
+\end{document}

@@ -74,6 +74,7 @@ That looks better, but what did we just do? --- When the sampler "warms up", it 
 A powerful interactive tool for exploring a fitted model (diagnostics and more) is `shinystan`:
 
 ```{r}
+#| eval: false
 shinystan::launch_shinystan(fit_good_adapt)
 ```
 
@@ -184,5 +185,6 @@ We should just not have `year_perturbed`; it's nonsense, and it shows in the dia
 You can diagnose more using `shinystan`:
 
 ```{r}
+#| eval: false
 shinystan::launch_shinystan(fit_bad)
 ```
