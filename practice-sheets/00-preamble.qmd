@@ -10,6 +10,7 @@ pckgs_needed <- c(
   "brms",
   "remotes",
   "tidybayes",
+  "bridgesampling",
   "shinystan"
 )
 pckgs_installed <- installed.packages()[,"Package"]

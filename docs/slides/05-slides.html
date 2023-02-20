@@ -512,8 +512,39 @@ w_{0,\mathtt{subj}_i} &amp; \sim \mathcal{N}(0, \sigma_{w_0}) \\
 <section id="varying-intercepts-model-results" class="slide level2">
 <h2>varying intercepts model: results</h2>
 <p><span style="color:white"> &nbsp; </span></p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output cell-output-stdout">
+<pre><code> Family: gaussian 
+  Links: mu = identity; sigma = identity 
+Formula: log(rt) ~ (1 | subj + so) + so 
+   Data: rt_data (Number of observations: 547) 
+  Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+         total post-warmup draws = 4000
 
-<img data-src="05-slides_files/figure-revealjs/unnamed-chunk-9-1.png" width="576" class="r-stretch quarto-figure-center"></section>
+Group-Level Effects: 
+~so (Number of levels: 2) 
+              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sd(Intercept)     1.47      1.27     0.07     5.15 1.02      171       58
+
+~subj (Number of levels: 37) 
+              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sd(Intercept)     0.25      0.04     0.18     0.34 1.01      958     1816
+
+Population-Level Effects: 
+          Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+Intercept     6.13      1.35     3.26     9.65 1.02      518       66
+so1          -0.18      2.10    -5.31     3.96 1.02      406       91
+
+Family Specific Parameters: 
+      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sigma     0.55      0.02     0.52     0.59 1.00     4109     2503
+
+Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+and Tail_ESS are effective sample size measures, and Rhat is the potential
+scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
+</div>
+</div>
+</section>
 <section id="interc.slopes-model" class="slide level2">
 <h2>interc.+slopes model</h2>
 <ul>
@@ -545,8 +576,39 @@ w_{1,\mathtt{subj}_i} &amp; \sim \mathcal{N}(0, \sigma_{w_1}) \\
 <section id="interc.slopes-model-results" class="slide level2">
 <h2>interc.+slopes model: results</h2>
 <p><span style="color:white"> &nbsp; </span></p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output cell-output-stdout">
+<pre><code> Family: gaussian 
+  Links: mu = identity; sigma = identity 
+Formula: log(rt) ~ (1 | subj + so) + so 
+   Data: rt_data (Number of observations: 547) 
+  Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+         total post-warmup draws = 4000
 
-<img data-src="05-slides_files/figure-revealjs/unnamed-chunk-11-1.png" width="576" class="r-stretch quarto-figure-center"></section>
+Group-Level Effects: 
+~so (Number of levels: 2) 
+              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sd(Intercept)     1.38      1.09     0.05     3.93 1.02      504     1489
+
+~subj (Number of levels: 37) 
+              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sd(Intercept)     0.25      0.04     0.18     0.34 1.00     1114     1682
+
+Population-Level Effects: 
+          Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+Intercept     6.07      1.22     3.42     8.86 1.01      919      755
+so1          -0.01      1.80    -4.04     4.01 1.02      843      838
+
+Family Specific Parameters: 
+      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sigma     0.55      0.02     0.52     0.58 1.00     2998     2485
+
+Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+and Tail_ESS are effective sample size measures, and Rhat is the potential
+scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
+</div>
+</div>
+</section>
 <section id="interc.slopes-model-w-correlation" class="slide level2">
 <h2>interc.+slopes model w/ correlation</h2>
 <ul>
@@ -577,8 +639,43 @@ w_{1,\mathtt{subj}_i} &amp; \sim \mathcal{N}(0, \sigma_{w_1}) \\
 <section id="interc.slopes-model-w-corr.-results" class="slide level2">
 <h2>interc.+slopes model w/ corr.: results</h2>
 <p><span style="color:white"> &nbsp; </span></p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output cell-output-stdout">
+<pre><code> Family: gaussian 
+  Links: mu = identity; sigma = identity 
+Formula: log(rt) ~ so + (1 + so | subj + item) 
+   Data: rt_data (Number of observations: 547) 
+  Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+         total post-warmup draws = 4000
 
-<img data-src="05-slides_files/figure-revealjs/unnamed-chunk-13-1.png" width="720" class="r-stretch quarto-figure-center"></section>
+Group-Level Effects: 
+~item (Number of levels: 15) 
+                   Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sd(Intercept)          0.20      0.06     0.11     0.34 1.00     1927     2375
+sd(so1)                0.07      0.05     0.00     0.20 1.00     1593     2210
+cor(Intercept,so1)    -0.04      0.54    -0.93     0.93 1.00     4785     2610
+
+~subj (Number of levels: 37) 
+                   Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sd(Intercept)          0.30      0.05     0.21     0.41 1.00     1504     2192
+sd(so1)                0.13      0.06     0.01     0.26 1.00     1367     1568
+cor(Intercept,so1)    -0.68      0.31    -0.99     0.20 1.00     2861     2566
+
+Population-Level Effects: 
+          Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+Intercept     6.10      0.08     5.94     6.26 1.00     1745     1917
+so1          -0.07      0.06    -0.18     0.04 1.00     4185     2797
+
+Family Specific Parameters: 
+      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sigma     0.52      0.02     0.48     0.55 1.00     5278     2890
+
+Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+and Tail_ESS are effective sample size measures, and Rhat is the potential
+scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
+</div>
+</div>
+</section>
 <section id="how-to-choose-re-structure" class="slide level2">
 <h2>How to choose RE-structure</h2>
 <ul>
