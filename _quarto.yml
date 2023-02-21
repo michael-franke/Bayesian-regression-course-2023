@@ -52,6 +52,12 @@ website:
             text: Hierarchical models (tutorial)
           - href: practice-sheets/05b-hierarchical-models-exercises.qmd
             text: Hierarchical models (exercises)
+      - section: "06: Model comparison"
+        contents:
+          - href: 06-model-comparison.qmd
+            text: Overview
+          - href: practice-sheets/06a-model-comparison.qmd
+            text: Model comparison (practice)
 format:
   html:
     theme: cosmo

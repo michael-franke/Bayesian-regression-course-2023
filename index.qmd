@@ -17,7 +17,7 @@ Starting with simple linear regression, we want to reach a basic understanding o
 
 ## Additional material
 
-An even more basic introduction to data analysis (introducing R, tidyvers, Bayesian and, eventually, also frequentist statistics) is the webbook ["An introduction to Data Analysis"](https://michael-franke.github.io/intro-data-analysis/index.html).
+An even more basic introduction to data analysis (introducing R, tidyverse, Bayesian and, eventually, also frequentist statistics) is the webbook ["An introduction to Data Analysis"](https://michael-franke.github.io/intro-data-analysis/index.html).
 
 ## Acknowledgements
 

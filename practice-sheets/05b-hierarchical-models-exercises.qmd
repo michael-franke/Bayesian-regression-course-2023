@@ -26,7 +26,7 @@ Consider the following model formula for the `dolphin` data set:
 
 ```{r}
 
-bf(MAD ~ condition + 
+brms::bf(MAD ~ condition + 
      (condition || subject_id) +
      (condition || exemplar))
 
