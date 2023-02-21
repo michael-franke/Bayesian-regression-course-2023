@@ -54,11 +54,10 @@ We are going to compare two models for this data, a normal regression model and 
 
 ## Normal and robust regression models
 
-A normal regression model uses a normal error function. Here's Stan code for this (note that we need to use `target += ...` constructions instead of `~` in order not to suppress the normalizing constants; this is important for later bridge sampling):
+A normal regression model uses a normal error function.
 
 ```{r}
-#| warning: false
-#| error: false
+#| include: false
 fit_n <- brm(
   formula = y ~ x,
   data = data_robust,
@@ -70,8 +69,7 @@ fit_n <- brm(
 We will want to compare this normal regression model with a **robust regression model**, which uses a Student's t distribution instead as the error function around the linear predictor:
 
 ```{r}
-#| warning: false
-#| error: false
+#| include: false
 fit_r <- brm(
   formula = y ~ x,
   data = data_robust,
