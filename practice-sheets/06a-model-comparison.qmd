@@ -57,7 +57,9 @@ We are going to compare two models for this data, a normal regression model and 
 A normal regression model uses a normal error function.
 
 ```{r}
-#| include: false
+#| output: false
+#| error: false
+#| warning: false
 fit_n <- brm(
   formula = y ~ x,
   data = data_robust,
@@ -69,7 +71,9 @@ fit_n <- brm(
 We will want to compare this normal regression model with a **robust regression model**, which uses a Student's t distribution instead as the error function around the linear predictor:
 
 ```{r}
-#| include: false
+#| output: false
+#| error: false
+#| warning: false
 fit_r <- brm(
   formula = y ~ x,
   data = data_robust,
