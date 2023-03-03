@@ -2,42 +2,78 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://michael-franke.github.io/Bayesian-regression-course-2023/practice-sheets/02d-linReg-multiple-catPredictors.html</loc>
-    <lastmod>2023-02-16T06:59:01.084Z</lastmod>
+    <lastmod>2023-03-03T11:32:21.945Z</lastmod>
   </url>
   <url>
     <loc>https://michael-franke.github.io/Bayesian-regression-course-2023/practice-sheets/00-preamble.html</loc>
-    <lastmod>2023-02-16T06:59:03.497Z</lastmod>
+    <lastmod>2023-03-03T11:32:22.439Z</lastmod>
+  </url>
+  <url>
+    <loc>https://michael-franke.github.io/Bayesian-regression-course-2023/practice-sheets/03b-GLM-exercises.html</loc>
+    <lastmod>2023-03-03T11:32:23.063Z</lastmod>
+  </url>
+  <url>
+    <loc>https://michael-franke.github.io/Bayesian-regression-course-2023/practice-sheets/04a-MCMC-diagnostics.html</loc>
+    <lastmod>2023-03-03T11:32:23.638Z</lastmod>
   </url>
   <url>
     <loc>https://michael-franke.github.io/Bayesian-regression-course-2023/practice-sheets/02b-catPreds-tutorial.html</loc>
-    <lastmod>2023-02-16T07:00:53.422Z</lastmod>
+    <lastmod>2023-03-03T11:32:24.532Z</lastmod>
+  </url>
+  <url>
+    <loc>https://michael-franke.github.io/Bayesian-regression-course-2023/practice-sheets/05b-hierarchical-models-exercises.html</loc>
+    <lastmod>2023-03-03T11:32:25.097Z</lastmod>
   </url>
   <url>
     <loc>https://michael-franke.github.io/Bayesian-regression-course-2023/practice-sheets/01b-simple-regression.html</loc>
-    <lastmod>2023-02-16T07:01:08.899Z</lastmod>
+    <lastmod>2023-03-03T11:32:25.750Z</lastmod>
+  </url>
+  <url>
+    <loc>https://michael-franke.github.io/Bayesian-regression-course-2023/practice-sheets/03a-GLM-tutorial.html</loc>
+    <lastmod>2023-03-03T11:32:26.473Z</lastmod>
   </url>
   <url>
     <loc>https://michael-franke.github.io/Bayesian-regression-course-2023/practice-sheets/02a-predictives.html</loc>
-    <lastmod>2023-02-16T07:02:46.302Z</lastmod>
+    <lastmod>2023-03-03T11:32:27.110Z</lastmod>
   </url>
   <url>
     <loc>https://michael-franke.github.io/Bayesian-regression-course-2023/practice-sheets/02c-catPreds-execises.html</loc>
-    <lastmod>2023-02-16T07:02:49.705Z</lastmod>
+    <lastmod>2023-03-03T11:32:27.697Z</lastmod>
   </url>
   <url>
     <loc>https://michael-franke.github.io/Bayesian-regression-course-2023/practice-sheets/01a-wrangling-plotting.html</loc>
-    <lastmod>2023-02-16T07:02:55.202Z</lastmod>
+    <lastmod>2023-03-03T11:32:28.518Z</lastmod>
+  </url>
+  <url>
+    <loc>https://michael-franke.github.io/Bayesian-regression-course-2023/practice-sheets/06a-model-comparison.html</loc>
+    <lastmod>2023-03-03T11:32:29.199Z</lastmod>
+  </url>
+  <url>
+    <loc>https://michael-franke.github.io/Bayesian-regression-course-2023/practice-sheets/05a-hierarchical-models-tutorial.html</loc>
+    <lastmod>2023-03-03T11:32:29.888Z</lastmod>
+  </url>
+  <url>
+    <loc>https://michael-franke.github.io/Bayesian-regression-course-2023/06-model-comparison.html</loc>
+    <lastmod>2023-03-03T11:32:30.194Z</lastmod>
   </url>
   <url>
     <loc>https://michael-franke.github.io/Bayesian-regression-course-2023/01-basics.html</loc>
-    <lastmod>2023-02-16T07:02:55.499Z</lastmod>
+    <lastmod>2023-03-03T11:32:30.491Z</lastmod>
   </url>
   <url>
     <loc>https://michael-franke.github.io/Bayesian-regression-course-2023/index.html</loc>
-    <lastmod>2023-02-16T07:02:55.793Z</lastmod>
+    <lastmod>2023-03-03T11:32:30.793Z</lastmod>
+  </url>
+  <url>
+    <loc>https://michael-franke.github.io/Bayesian-regression-course-2023/04-MCMC.html</loc>
+    <lastmod>2023-03-03T11:32:31.084Z</lastmod>
+  </url>
+  <url>
+    <loc>https://michael-franke.github.io/Bayesian-regression-course-2023/05-hierarchical-models.html</loc>
+    <lastmod>2023-03-03T11:32:31.373Z</lastmod>
   </url>
   <url>
     <loc>https://michael-franke.github.io/Bayesian-regression-course-2023/02-priorPredictives-categPredictors.html</loc>
-    <lastmod>2023-02-16T07:02:56.099Z</lastmod>
+    <lastmod>2023-03-03T11:32:31.672Z</lastmod>
   </url>
 </urlset>
