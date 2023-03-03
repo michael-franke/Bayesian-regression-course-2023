@@ -35,7 +35,7 @@ Link function and likelihood function may have additional free parameters, $\the
 Simple linear regression is the special case of this scheme where the link function is just the identity function and the likelihood is given by \$y \\sim \\mathcal{N}(\\eta; \\sigma)\$. Different types of regression are used to account for different kinds predicted variable $y$:
 
 | type of $y$ |             (inverse) link function             |         likelihood function          |
-|:--------------------|:------------------------:|:------------------------:|
+|:------------|:-----------------------------------------------:|:------------------------------------:|
 | metric      |                  $\eta = \xi$                   | $y \sim \text{Normal}(\eta; \sigma)$ |
 | binary      |          $\eta = \text{logistic}(\xi)$          |   $y \sim \text{Bernoulli}(\eta)$    |
 | nominal     |          $\eta = \text{soft-max}(\xi)$          | $y \sim \text{Categorical}({\eta})$  |
@@ -391,8 +391,7 @@ $$
 \text{logistic}(\delta_1 - \xi) & \text{if } i=1 \\
 \text{logistic}(\delta_{i} - \xi) - \eta_i & \text{if } i>1 \\
 \end{cases}
-$$
-To see what is going on, consider the a case with three categories. Fix the two threshold $\delta_1=-0.75$ and $\delta_2=1.6$ just for illustration. Now assume that we have a case there the linear predictor value $\eta$ is zero. The cumulative logit function above then entails the category probabilities as shown in this plot, as the length of the colored bar segments: 
+$$ To see what is going on, consider the a case with three categories. Fix the two threshold $\delta_1=-0.75$ and $\delta_2=1.6$ just for illustration. Now assume that we have a case there the linear predictor value $\eta$ is zero. The cumulative logit function above then entails the category probabilities as shown in this plot, as the length of the colored bar segments:
 
 ```{r}
 #| echo: false
@@ -482,7 +481,6 @@ tibble(x = seq(-4,4, length.out = 100),
   xlab("") + ylab("")
 ```
 
-
 In sum, the cumulative-logit model for ordinal regression, is defined as follows:
 
 $$
@@ -509,7 +507,7 @@ dolphin_prepped2 |>
   geom_jitter(alpha = 0.3,height = 0.3, width = 0)
 ```
 
-To run an ordinal regression model, we specify `family = cumulative()`. This runs the default cumulative-logit model introduced at the beginning of the session. 
+To run an ordinal regression model, we specify `family = cumulative()`. This runs the default cumulative-logit model introduced at the beginning of the session.
 
 ```{r}
 fit_ordinal <- brm(
